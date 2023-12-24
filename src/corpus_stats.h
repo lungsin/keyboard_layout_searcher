@@ -6,18 +6,17 @@
 
 #include "raw_corpus_stats.h"
 
-using namespace std;
-
 class CorpusStats {
   const int keysetSize;
 
-  vector<vector<long long>> bigrams, skipgrams;
+  std::vector<std::vector<long long>> bigrams, skipgrams;
   long long totalBigrams, totalSkipgrams;
 
-  array<optional<int>, 256> charId;
+  std::array<std::optional<int>, 256> charId;
 
  public:
-  CorpusStats(vector<char> const& keyset, RawCorpusStats const& rawCorpusStats);
+  CorpusStats(std::vector<char> const& keyset,
+              RawCorpusStats const& rawCorpusStats);
 
   double getBigramPercentage(char c1, char c2) const;
 

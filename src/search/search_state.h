@@ -2,9 +2,7 @@
 
 #include <vector>
 
-using namespace std;
-
-using Bucket = vector<char>;
+using Bucket = std::vector<char>;
 
 Bucket newBucketWithCapacity(int capacity);
 
@@ -13,14 +11,14 @@ struct BucketSpec {
 };
 
 class RecursionState {
-  const vector<BucketSpec> bucketSpecs;
+  const std::vector<BucketSpec> bucketSpecs;
 
-  vector<vector<Bucket>> bucketsBySpec;
-  vector<int> numBucketsAddedBySpec;
-  vector<pair<int, int>> activeBucketIdStack;
+  std::vector<std::vector<Bucket>> bucketsBySpec;
+  std::vector<int> numBucketsAddedBySpec;
+  std::vector<std::pair<int, int>> activeBucketIdStack;
 
  public:
-  RecursionState(const vector<BucketSpec>& bucketSpecs);
+  RecursionState(const std::vector<BucketSpec>& bucketSpecs);
 
   void addKeyToCurrentBucket(char key);
 

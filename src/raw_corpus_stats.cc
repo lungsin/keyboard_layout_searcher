@@ -1,12 +1,12 @@
 #include "raw_corpus_stats.h"
 
-RawCorpusStats::RawCorpusStats(istream& textStream) {
-  for (string word; textStream >> word;) {
+RawCorpusStats::RawCorpusStats(std::istream& textStream) {
+  for (std::string word; textStream >> word;) {
     addWord(word);
   }
 }
 
-void RawCorpusStats::addWord(const string& word) {
+void RawCorpusStats::addWord(const std::string& word) {
   const int n = word.size();
   for (const char& c : word) {
     characters[c]++;

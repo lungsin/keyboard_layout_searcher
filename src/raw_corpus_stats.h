@@ -3,18 +3,16 @@
 #include <istream>
 #include <unordered_map>
 
-using namespace std;
-
 struct RawCorpusStats {
   long long totalChars;
-  unordered_map<char, long long> characters;
+  std::unordered_map<char, long long> characters;
 
   long long totalBigrams, totalSkipgrams, totalSkipgrams2, totalSkipgrams3,
       totalTrigrams;
-  unordered_map<string, long long> bigrams, skipgrams, skipgrams2, skipgrams3,
-      trigrams;
+  std::unordered_map<std::string, long long> bigrams, skipgrams, skipgrams2,
+      skipgrams3, trigrams;
 
-  RawCorpusStats(istream& textStream);
+  RawCorpusStats(std::istream& textStream);
 
-  void addWord(const string& word);
+  void addWord(const std::string& word);
 };

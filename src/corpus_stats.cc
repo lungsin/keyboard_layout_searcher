@@ -2,13 +2,11 @@
 
 #include <nlohmann/json.hpp>
 
-using namespace std;
-
-CorpusStats::CorpusStats(vector<char> const& keyset,
+CorpusStats::CorpusStats(std::vector<char> const& keyset,
                          RawCorpusStats const& rawCorpusStats)
     : keysetSize(keyset.size()),
-      bigrams(keysetSize, vector(keysetSize, 0LL)),
-      skipgrams(keysetSize, vector(keysetSize, 0LL)),
+      bigrams(keysetSize, std::vector(keysetSize, 0LL)),
+      skipgrams(keysetSize, std::vector(keysetSize, 0LL)),
       totalBigrams(rawCorpusStats.totalBigrams),
       totalSkipgrams(rawCorpusStats.totalSkipgrams) {
   for (int i = 0; i < keysetSize; i++) {

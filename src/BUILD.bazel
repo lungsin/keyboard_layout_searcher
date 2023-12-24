@@ -8,12 +8,6 @@ cc_binary(
 )
 
 cc_library(
-    name = "recursion_state",
-    srcs = ["recursion_state.cc"],
-    hdrs = ["recursion_state.h"],
-)
-
-cc_library(
     name = "corpus_stats",
     srcs = ["corpus_stats.cc"],
     hdrs = ["corpus_stats.h"],

@@ -1,4 +1,4 @@
-#include "recursion_state.h"
+#include "search_state.h"
 
 Bucket newBucketWithCapacity(int capacity) {
   Bucket b;
@@ -6,7 +6,7 @@ Bucket newBucketWithCapacity(int capacity) {
   return b;
 }
 
-RecursionState::RecursionState(const vector<BucketSpec>& bucketSpecs)
+RecursionState::RecursionState(const std::vector<BucketSpec>& bucketSpecs)
     : bucketSpecs(bucketSpecs),
       bucketsBySpec(bucketSpecs.size()),
       numBucketsAddedBySpec(bucketSpecs.size(), 0) {

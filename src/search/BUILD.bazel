@@ -1,0 +1,5 @@
+cc_library(
+    name = "search_state",
+    srcs = ["search_state.cc"],
+    hdrs = ["search_state.h"],
+)
