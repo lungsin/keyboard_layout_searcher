@@ -2,12 +2,12 @@
 
 #include <iostream>
 
-#include "layout.h"
+using namespace std;
 
 int main(int, char **) {
   std::cout << "Hello, from klungsyzer!\n";
 
-  auto x = "unused var";
+  optional<reference_wrapper<int>> optionalRef;
 
   return 0;
 }

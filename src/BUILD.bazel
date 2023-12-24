@@ -4,4 +4,27 @@ cc_binary(
         "layout.h",
         "main.cc",
     ],
+    deps = [":recursion_state"],
+)
+
+cc_library(
+    name = "recursion_state",
+    srcs = ["recursion_state.cc"],
+    hdrs = ["recursion_state.h"],
+)
+
+cc_library(
+    name = "corpus_stats",
+    srcs = ["corpus_stats.cc"],
+    hdrs = ["corpus_stats.h"],
+    deps = [
+        "raw_corpus_stats",
+        "@nlohmann_json//:json",
+    ],
+)
+
+cc_library(
+    name = "raw_corpus_stats",
+    srcs = ["raw_corpus_stats.cc"],
+    hdrs = ["raw_corpus_stats.h"],
 )

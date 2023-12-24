@@ -1,0 +1,15 @@
+cc_library(
+    name = "two_best_set",
+    srcs = ["two_best_set.cc"],
+    hdrs = ["two_best_set.h"],
+)
+
+cc_test(
+    name = "two_best_set_test",
+    size = "small",
+    srcs = ["two_best_set_test.cc"],
+    deps = [
+        "two_best_set",
+        "@googletest//:gtest_main",
+    ],
+)
