@@ -12,6 +12,6 @@ cc_library(
     deps = [
         "search_state",
         "//src:corpus_stats",
-        "//src/data_structure:two_best_set",
+        "//src/data_structure:best_pair_set",
     ],
 )

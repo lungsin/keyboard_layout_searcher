@@ -1,4 +1,4 @@
-#include "two_best_set.h"
+#include "best_pair_set.h"
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
@@ -8,8 +8,8 @@ using ::testing::IsEmpty;
 using ::testing::WhenSorted;
 
 // Demonstrate some basic assertions.
-TEST(TwoBestSet, TestSimpleOperations) {
-  TwoBestSet<int, int, int> bestInt;
+TEST(BestPairSet, TestSimpleOperations) {
+  BestPairSet<int, int, int> bestInt;
 
   EXPECT_THAT(bestInt.insert(5, 5, 0), IsEmpty());
   EXPECT_THAT(bestInt.insert(4, 6, 1), IsEmpty());

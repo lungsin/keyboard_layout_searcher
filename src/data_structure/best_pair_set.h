@@ -26,7 +26,7 @@ struct MetricPair {
 
 template <std::totally_ordered Metric1, std::totally_ordered Metric2,
           typename Data>
-class TwoBestSet {
+class BestPairSet {
   using MetricKey = MetricPair<Metric1, Metric2>;
 
  public:

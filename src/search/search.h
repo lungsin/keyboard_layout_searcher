@@ -2,7 +2,7 @@
 
 #include "search_state.h"
 #include "src/corpus_stats.h"
-#include "src/data_structure/two_best_set.h"
+#include "src/data_structure/best_pair_set.h"
 
 struct Threshold {
   double sfb, sfs;
@@ -25,5 +25,5 @@ void search(Keyset const& keyset, std::vector<BucketSpec> const& bucket_specs,
 
 void search(SearchState& state, CorpusStats const& corpus_stats,
             ThresholdOcc const& threshold, SearchStats const& search_stats,
-            TwoBestSet<long long, long long, std::vector<Bucket>>& best_result,
+            BestPairSet<long long, long long, std::vector<Bucket>>& best_result,
             SearchMetadata& metadata);
