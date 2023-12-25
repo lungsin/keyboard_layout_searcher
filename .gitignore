@@ -62,3 +62,6 @@ test/test_runner
 # clangd
 
 .cache
+
+# text folder
+static/text

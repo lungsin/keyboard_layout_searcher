@@ -2,6 +2,7 @@ cc_library(
     name = "two_best_set",
     srcs = ["two_best_set.cc"],
     hdrs = ["two_best_set.h"],
+    visibility = ["//src/search:__pkg__"],
 )
 
 cc_test(

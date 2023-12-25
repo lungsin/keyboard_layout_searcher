@@ -1,0 +1,29 @@
+#pragma once
+
+#include "search_state.h"
+#include "src/corpus_stats.h"
+#include "src/data_structure/two_best_set.h"
+
+struct Threshold {
+  double sfb, sfs;
+};
+
+struct ThresholdOcc {
+  long long sfb, sfs;
+};
+
+struct SearchStats {
+  long long sfb, sfs;
+};
+
+struct SearchMetadata {
+  int num_iteration;
+};
+
+void search(Keyset const& keyset, std::vector<BucketSpec> const& bucket_specs,
+            std::vector<RawCorpusStats> corpuses, Threshold const& threshold);
+
+void search(SearchState& state, CorpusStats const& corpus_stats,
+            ThresholdOcc const& threshold, SearchStats const& search_stats,
+            TwoBestSet<long long, long long, std::vector<Bucket>>& best_result,
+            SearchMetadata& metadata);

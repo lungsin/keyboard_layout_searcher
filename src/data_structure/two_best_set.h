@@ -61,6 +61,16 @@ class TwoBestSet {
     return erased_data;
   }
 
+  bool isExistsBetterMetricThan(Metric1 m1, Metric2 m2) {
+    MetricPair m = {m1, m2};
+    auto it = store_.lower_bound(m);
+    // if exists a better metric in the store
+    if (it != store_.end() && std::prev(it)->first.betterThan(m)) {
+      return true;
+    }
+    return false;
+  }
+
   std::vector<Data> getAllData() {
     std::vector<Data> result;
     for (auto const& [metric_key, data_list] : store_)

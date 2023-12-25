@@ -1,6 +1,10 @@
 #pragma once
 
+#include <functional>
+#include <unordered_set>
 #include <vector>
+
+#include "src/types.h"
 
 using Bucket = std::vector<char>;
 
@@ -10,15 +14,16 @@ struct BucketSpec {
   int capacity, count;
 };
 
-class RecursionState {
-  const std::vector<BucketSpec> bucketSpecs;
-
-  std::vector<std::vector<Bucket>> bucketsBySpec;
-  std::vector<int> numBucketsAddedBySpec;
-  std::vector<std::pair<int, int>> activeBucketIdStack;
-
+class SearchState {
  public:
-  RecursionState(const std::vector<BucketSpec>& bucketSpecs);
+  enum Phase {
+    ADD_BUCKET,
+    ADD_KEY,
+    END,
+  };
+
+  SearchState(std::vector<char> const& keyset,
+              std::vector<BucketSpec> const& bucket_specs);
 
   void addKeyToCurrentBucket(char key);
 
@@ -28,6 +33,26 @@ class RecursionState {
 
   void undoAddNewBucket();
 
+  // Action helper
+  Phase getPhase() const;
+
+  std::vector<int> getUnusedBucketSpecIds() const;
+
+  Keyset getUnusedKeys() const;
+
+  // Helper
+  Bucket const& getCurrentBucket() const;
+
+  std::vector<Bucket> getAllBuckets() const;
+
  private:
-  Bucket& getCurrentBucket();
+  const std::vector<BucketSpec> bucket_specs_;
+  const Keyset keyset_;
+
+  std::vector<std::vector<Bucket>> bucketsBySpec_;
+  std::vector<int> numBucketsAddedBySpec_;
+  std::vector<std::pair<int, int>> activeBucketIdStack_;
+  std::vector<std::reference_wrapper<Bucket>> activeBucketRefStack_;
+
+  std::unordered_set<char> unused_keys_;
 };
