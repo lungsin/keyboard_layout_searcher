@@ -22,6 +22,9 @@ cc_library(
     name = "raw_corpus_stats",
     srcs = ["raw_corpus_stats.cc"],
     hdrs = ["raw_corpus_stats.h"],
+    deps = [
+        "@nlohmann_json//:json",
+    ],
 )
 
 cc_library(

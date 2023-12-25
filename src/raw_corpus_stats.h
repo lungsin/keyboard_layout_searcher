@@ -1,18 +1,25 @@
 #pragma once
 
-#include <istream>
+#include <iostream>
+#include <nlohmann/json.hpp>
 #include <unordered_map>
 
 struct RawCorpusStats {
-  long long totalChars;
+  long long total_chars;
   std::unordered_map<char, long long> characters;
 
-  long long totalBigrams, totalSkipgrams, totalSkipgrams2, totalSkipgrams3,
-      totalTrigrams;
+  long long total_bigrams, total_skipgrams, total_skipgrams2, total_skipgrams3,
+      total_trigrams;
   std::unordered_map<std::string, long long> bigrams, skipgrams, skipgrams2,
       skipgrams3, trigrams;
 
-  RawCorpusStats(std::istream& textStream);
+  RawCorpusStats(std::istream& text_stream);
 
   void addWord(const std::string& word);
+
+  nlohmann::json as_json() const;
+
+  void save_as_json(std::ostream& out_stream) const;
+
+  void save_as_json(std::string file_name) const;
 };

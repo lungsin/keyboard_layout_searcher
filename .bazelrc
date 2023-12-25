@@ -4,5 +4,8 @@ common --enable_bzlmod
 build --cxxopt=-std=c++20
 build --cxxopt=-Ofast
 
+run --cxxopt=-std=c++20
+run --cxxopt=-Ofast
+
 test --cxxopt=-std=c++20
 test --cxxopt=-Ofast

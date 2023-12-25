@@ -1,6 +1,5 @@
 #pragma once
 
-#include <functional>
 #include <unordered_set>
 #include <vector>
 

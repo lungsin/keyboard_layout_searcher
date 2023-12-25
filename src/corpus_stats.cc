@@ -4,8 +4,8 @@
 
 CorpusStats::CorpusStats(std::vector<char> const& keyset,
                          RawCorpusStats const& raw_corpuses_stats)
-    : total_bigrams_(raw_corpuses_stats.totalBigrams),
-      total_skipgrams_(raw_corpuses_stats.totalSkipgrams),
+    : total_bigrams_(raw_corpuses_stats.total_bigrams),
+      total_skipgrams_(raw_corpuses_stats.total_skipgrams),
       keyset_size_(keyset.size()),
       keyset_(keyset),
       char_id_(createCharIdMapper(keyset)),
