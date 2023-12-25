@@ -1,7 +1,13 @@
 #include "search.h"
 
-void search(Keyset const& keyset, std::vector<BucketSpec> const& bucket_specs,
-            RawCorpusStats raw_corpus_stats, Threshold const& threshold) {
+#include <iostream>
+
+LayoutWithMetric search(Keyset const& keyset,
+                        std::vector<BucketSpec> const& bucket_specs,
+                        RawCorpusStats const& raw_corpus_stats,
+                        Threshold const& threshold) {
+  for (auto x : bucket_specs) std::cerr << x.capacity << std::endl;
+
   // TODO: sort keyset by occurance
   SearchState state(keyset, bucket_specs);
   CorpusStats corpus_stats(keyset, raw_corpus_stats);
@@ -11,6 +17,9 @@ void search(Keyset const& keyset, std::vector<BucketSpec> const& bucket_specs,
   SearchMetadata metadata;
   search(state, corpus_stats, threshold_occ, SearchStats(0LL, 0LL), best_result,
          metadata);
+
+  std::cerr << "Iteration number: " << metadata.num_iteration << std::endl;
+  return best_result.getAllData();
 }
 
 void search(SearchState& state, CorpusStats const& corpus_stats,
@@ -20,11 +29,16 @@ void search(SearchState& state, CorpusStats const& corpus_stats,
   metadata.num_iteration++;
 
   // pruning
-  if (search_stats.sfb > threshold.sfb || search_stats.sfs > threshold.sfs)
+  if (search_stats.sfb > threshold.sfb || search_stats.sfs > threshold.sfs) {
+    std::cerr << "threshold prune" << std::endl;
     return;
+  }
 
-  if (best_result.isExistsBetterMetricThan(search_stats.sfb, search_stats.sfs))
+  if (best_result.isExistsBetterMetricThan(search_stats.sfb,
+                                           search_stats.sfs)) {
+    std::cerr << "here" << std::endl;
     return;
+  }
 
   // recursion
   switch (state.getPhase()) {
@@ -54,6 +68,7 @@ void search(SearchState& state, CorpusStats const& corpus_stats,
       break;
     }
     case SearchState::Phase::END: {
+      std::cerr << "END" << std::endl;
       best_result.insert(search_stats.sfb, search_stats.sfs,
                          state.getAllBuckets());
       break;

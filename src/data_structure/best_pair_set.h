@@ -71,10 +71,11 @@ class BestPairSet {
     return false;
   }
 
-  std::vector<Data> getAllData() {
-    std::vector<Data> result;
+  std::vector<std::tuple<Metric1, Metric2, Data>> getAllData() {
+    std::vector<std::tuple<Metric1, Metric2, Data>> result;
     for (auto const& [metric_key, data_list] : store_)
-      result.insert(result.end(), data_list.begin(), data_list.end());
+      for (auto const& data : data_list)
+        result.push_back({metric_key.m1, metric_key.m2, data});
     return result;
   }
 

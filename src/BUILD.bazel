@@ -1,9 +1,9 @@
 cc_binary(
     name = "klungsyzer",
     srcs = [
-        "layout.h",
         "main.cc",
     ],
+    deps = ["//src/search"],
 )
 
 cc_library(

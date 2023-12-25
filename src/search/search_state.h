@@ -8,8 +8,6 @@
 
 using Bucket = std::vector<char>;
 
-Bucket newBucketWithCapacity(int capacity);
-
 struct BucketSpec {
   int capacity, count;
 };
@@ -46,13 +44,15 @@ class SearchState {
   std::vector<Bucket> getAllBuckets() const;
 
  private:
+  Bucket& getCurrentBucketInternal();
+
   const std::vector<BucketSpec> bucket_specs_;
   const Keyset keyset_;
+  size_t target_total_buckets_;
 
   std::vector<std::vector<Bucket>> bucketsBySpec_;
   std::vector<int> numBucketsAddedBySpec_;
   std::vector<std::pair<int, int>> activeBucketIdStack_;
-  std::vector<std::reference_wrapper<Bucket>> activeBucketRefStack_;
 
   std::unordered_set<char> unused_keys_;
 };

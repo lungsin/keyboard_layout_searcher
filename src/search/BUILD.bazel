@@ -9,9 +9,20 @@ cc_library(
     name = "search",
     srcs = ["search.cc"],
     hdrs = ["search.h"],
+    visibility = ["//src:__pkg__"],
     deps = [
         "search_state",
         "//src:corpus_stats",
         "//src/data_structure:best_pair_set",
+    ],
+)
+
+cc_test(
+    name = "search_state_test",
+    size = "small",
+    srcs = ["search_state_test.cc"],
+    deps = [
+        "search_state",
+        "@googletest//:gtest_main",
     ],
 )

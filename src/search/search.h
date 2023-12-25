@@ -20,8 +20,13 @@ struct SearchMetadata {
   int num_iteration;
 };
 
-void search(Keyset const& keyset, std::vector<BucketSpec> const& bucket_specs,
-            std::vector<RawCorpusStats> corpuses, Threshold const& threshold);
+using LayoutWithMetric =
+    std::vector<std::tuple<long long, long long, std::vector<Bucket>>>;
+
+LayoutWithMetric search(Keyset const& keyset,
+                        std::vector<BucketSpec> const& bucket_specs,
+                        RawCorpusStats const& raw_corpus_stats,
+                        Threshold const& threshold);
 
 void search(SearchState& state, CorpusStats const& corpus_stats,
             ThresholdOcc const& threshold, SearchStats const& search_stats,
