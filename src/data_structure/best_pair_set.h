@@ -9,6 +9,8 @@ struct MetricPair {
   TMetric1 m1;
   TMetric2 m2;
 
+  MetricPair(TMetric1 m1, TMetric2 m2) : m1(m1), m2(m2) {}
+
   std::strong_ordering operator<=>(
       MetricPair<TMetric1, TMetric2> const& o) const {
     if (m1 == o.m1) return m2 <=> o.m2;
@@ -31,7 +33,7 @@ class BestPairSet {
 
  public:
   std::vector<Data> insert(Metric1 m1, Metric2 m2, Data data) {
-    MetricPair m = {m1, m2};
+    MetricPair m(m1, m2);
 
     auto lowerbound_it = store_.lower_bound(m);
     // if the store has the same metric stored
@@ -62,7 +64,7 @@ class BestPairSet {
   }
 
   bool isExistsBetterMetricThan(Metric1 m1, Metric2 m2) {
-    MetricPair m = {m1, m2};
+    MetricPair m(m1, m2);
     auto it = store_.lower_bound(m);
     // if exists a better metric in the store
     if (it != store_.end() && std::prev(it)->first.betterThan(m)) {

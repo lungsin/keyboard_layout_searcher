@@ -9,7 +9,7 @@
 
 class CorpusStats {
  public:
-  CorpusStats(Keyset const& keyset, RawCorpusStats const& raw_corpuses_stats);
+  CorpusStats(Keyset const& keyset, RawCorpusStats const& raw_corpus_stats);
 
   double getBigramPercentage(char c1, char c2) const;
 

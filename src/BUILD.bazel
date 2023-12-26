@@ -3,7 +3,10 @@ cc_binary(
     srcs = [
         "main.cc",
     ],
-    deps = ["//src/search"],
+    data = ["//static:corpus_data"],
+    deps = [
+        "//src/search",
+    ],
 )
 
 cc_library(
@@ -18,12 +21,32 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "corpus_stats_test",
+    size = "small",
+    srcs = ["corpus_stats_test.cc"],
+    deps = [
+        "corpus_stats",
+        "@googletest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "raw_corpus_stats",
     srcs = ["raw_corpus_stats.cc"],
     hdrs = ["raw_corpus_stats.h"],
     deps = [
         "@nlohmann_json//:json",
+    ],
+)
+
+cc_test(
+    name = "raw_corpus_stats_test",
+    size = "small",
+    srcs = ["raw_corpus_stats_test.cc"],
+    deps = [
+        "raw_corpus_stats",
+        "@googletest//:gtest_main",
     ],
 )
 

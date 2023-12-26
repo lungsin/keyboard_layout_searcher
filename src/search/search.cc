@@ -11,12 +11,13 @@ LayoutWithMetric search(Keyset const& keyset,
   // TODO: sort keyset by occurance
   SearchState state(keyset, bucket_specs);
   CorpusStats corpus_stats(keyset, raw_corpus_stats);
-  ThresholdOcc threshold_occ(threshold.sfb * corpus_stats.total_bigrams_,
-                             threshold.sfs * corpus_stats.total_skipgrams_);
+  ThresholdOcc threshold_occ(
+      {(long long)threshold.sfb * corpus_stats.total_bigrams_,
+       (long long)threshold.sfs * corpus_stats.total_skipgrams_});
   BestPairSet<long long, long long, std::vector<Bucket>> best_result;
   SearchMetadata metadata;
-  search(state, corpus_stats, threshold_occ, SearchStats(0LL, 0LL), best_result,
-         metadata);
+  search(state, corpus_stats, threshold_occ, SearchStats({0LL, 0LL}),
+         best_result, metadata);
 
   std::cerr << "Iteration number: " << metadata.num_iteration << std::endl;
   return best_result.getAllData();

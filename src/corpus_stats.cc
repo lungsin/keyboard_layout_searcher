@@ -3,16 +3,16 @@
 #include <nlohmann/json.hpp>
 
 CorpusStats::CorpusStats(std::vector<char> const& keyset,
-                         RawCorpusStats const& raw_corpuses_stats)
-    : total_bigrams_(raw_corpuses_stats.total_bigrams),
-      total_skipgrams_(raw_corpuses_stats.total_skipgrams),
+                         RawCorpusStats const& raw_corpus_stats)
+    : total_bigrams_(raw_corpus_stats.total_bigrams),
+      total_skipgrams_(raw_corpus_stats.total_skipgrams),
       keyset_size_(keyset.size()),
       keyset_(keyset),
       char_id_(createCharIdMapper(keyset)),
-      bigrams_(createBigramOccurance(keyset_size_, raw_corpuses_stats.bigrams,
+      bigrams_(createBigramOccurance(keyset_size_, raw_corpus_stats.bigrams,
                                      char_id_)),
-      skipgrams_(createBigramOccurance(
-          keyset_size_, raw_corpuses_stats.skipgrams, char_id_)) {}
+      skipgrams_(createBigramOccurance(keyset_size_, raw_corpus_stats.skipgrams,
+                                       char_id_)) {}
 
 double CorpusStats::getBigramPercentage(char c1, char c2) const {
   return (double)getBigramOccurance(c1, c2) / total_bigrams_;

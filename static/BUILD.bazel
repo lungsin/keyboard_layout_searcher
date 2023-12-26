@@ -1,0 +1,7 @@
+# exports_files(glob(["**"]))
+
+filegroup(
+    name = "corpus_data",
+    srcs = glob(["**"]),
+    visibility = ["//src:__pkg__"],
+)
