@@ -2,7 +2,7 @@
 #include <iostream>
 #include <string>
 
-#include "src/search/search.h"
+#include "core/search/search.h"
 
 using namespace std;
 

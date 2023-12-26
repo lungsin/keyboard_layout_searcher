@@ -1,8 +1,8 @@
 #pragma once
 
+#include "core/corpus_stats.h"
+#include "core/data_structure/best_pair_set.h"
 #include "search_state.h"
-#include "src/corpus_stats.h"
-#include "src/data_structure/best_pair_set.h"
 
 struct Threshold {
   double sfb, sfs;

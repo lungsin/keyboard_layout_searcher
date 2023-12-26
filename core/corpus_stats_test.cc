@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include "src/raw_corpus_stats.h"
+#include "core/raw_corpus_stats.h"
 
 // Demonstrate some basic assertions.
 TEST(CorpusStats, TestConstructor) {

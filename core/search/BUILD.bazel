@@ -2,18 +2,18 @@ cc_library(
     name = "search_state",
     srcs = ["search_state.cc"],
     hdrs = ["search_state.h"],
-    deps = ["//src:types"],
+    deps = ["//core:types"],
 )
 
 cc_library(
     name = "search",
     srcs = ["search.cc"],
     hdrs = ["search.h"],
-    visibility = ["//src:__pkg__"],
+    visibility = ["//core:__pkg__"],
     deps = [
         "search_state",
-        "//src:corpus_stats",
-        "//src/data_structure:best_pair_set",
+        "//core:corpus_stats",
+        "//core/data_structure:best_pair_set",
     ],
 )
 

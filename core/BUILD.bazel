@@ -5,7 +5,7 @@ cc_binary(
     ],
     data = ["//static:corpus_data"],
     deps = [
-        "//src/search",
+        "//core/search",
     ],
 )
 
@@ -13,7 +13,7 @@ cc_library(
     name = "corpus_stats",
     srcs = ["corpus_stats.cc"],
     hdrs = ["corpus_stats.h"],
-    visibility = ["//src/search:__pkg__"],
+    visibility = ["//core/search:__pkg__"],
     deps = [
         "raw_corpus_stats",
         "types",

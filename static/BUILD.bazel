@@ -3,5 +3,5 @@
 filegroup(
     name = "corpus_data",
     srcs = glob(["**"]),
-    visibility = ["//src:__pkg__"],
+    visibility = ["//core:__pkg__"],
 )
