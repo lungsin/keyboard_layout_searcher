@@ -2,7 +2,7 @@
 
 #include <nlohmann/json.hpp>
 
-CorpusStats::CorpusStats(std::vector<char> const& keyset,
+CorpusStats::CorpusStats(Keyset const& keyset,
                          RawCorpusStats const& raw_corpus_stats)
     : total_bigrams_(raw_corpus_stats.total_bigrams),
       total_skipgrams_(raw_corpus_stats.total_skipgrams),
@@ -14,20 +14,21 @@ CorpusStats::CorpusStats(std::vector<char> const& keyset,
       skipgrams_(createBigramOccurance(keyset_size_, raw_corpus_stats.skipgrams,
                                        char_id_)) {}
 
-double CorpusStats::getBigramPercentage(char c1, char c2) const {
+double CorpusStats::getBigramPercentage(CorpusChar c1, CorpusChar c2) const {
   return (double)getBigramOccurance(c1, c2) / total_bigrams_;
 }
 
-double CorpusStats::getSkipgramPercentage(char c1, char c2) const {
+double CorpusStats::getSkipgramPercentage(CorpusChar c1, CorpusChar c2) const {
   return (double)getSkipgramOccurance(c1, c2) / total_skipgrams_;
 }
 
-long long CorpusStats::getBigramOccurance(char c1, char c2) const {
+long long CorpusStats::getBigramOccurance(CorpusChar c1, CorpusChar c2) const {
   if (!char_id_[c1].has_value() || !char_id_[c2].has_value()) return 0.0;
   return bigrams_[char_id_[c1].value()][char_id_[c2].value()];
 }
 
-long long CorpusStats::getSkipgramOccurance(char c1, char c2) const {
+long long CorpusStats::getSkipgramOccurance(CorpusChar c1,
+                                            CorpusChar c2) const {
   if (!char_id_[c1].has_value() || !char_id_[c2].has_value()) return 0.0;
   return skipgrams_[char_id_[c1].value()][char_id_[c2].value()];
 }
@@ -42,7 +43,7 @@ CorpusStats::CharIdMapper const CorpusStats::createCharIdMapper(
 }
 
 CorpusStats::BigramOccurance const CorpusStats::createBigramOccurance(
-    size_t keyset_size, std::unordered_map<std::string, long long> bigrams,
+    size_t keyset_size, std::unordered_map<CorpusString, long long> bigrams,
     CharIdMapper char_id) {
   BigramOccurance occ(keyset_size, std::vector(keyset_size, 0LL));
   for (const auto& [bigramStr, occurance] : bigrams) {

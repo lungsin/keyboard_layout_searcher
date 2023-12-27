@@ -2,7 +2,7 @@
 
 #include <ranges>
 
-SearchState::SearchState(std::vector<char> const& keyset,
+SearchState::SearchState(Keyset const& keyset,
                          std::vector<BucketSpec> const& bucket_specs)
     : bucket_specs_(bucket_specs),
       keyset_(keyset),
@@ -20,7 +20,7 @@ SearchState::SearchState(std::vector<char> const& keyset,
   activeBucketIdStack_.reserve(target_total_buckets_);
 }
 
-void SearchState::addKeyToCurrentBucket(char key) {
+void SearchState::addKeyToCurrentBucket(CorpusChar key) {
   getCurrentBucketInternal().push_back(key);
   unused_keys_.erase(key);
 }
@@ -74,12 +74,12 @@ SearchState::Phase SearchState::getPhase() const {
   return Phase::END;
 }
 
-std::vector<int> SearchState::getUnusedBucketSpecIds() const {
+std::vector<BucketSpecId> SearchState::getUnusedBucketSpecIds() const {
   auto r = std::views::iota(0, (int)bucket_specs_.size()) |
            std::views::filter([&](int i) {
              return numBucketsAddedBySpec_[i] < bucket_specs_[i].count;
            });
-  return std::vector<int>(r.begin(), r.end());
+  return std::vector<BucketSpecId>(r.begin(), r.end());
 }
 
 Keyset SearchState::getUnusedKeys() const {

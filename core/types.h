@@ -1,5 +1,9 @@
 #pragma once
 
+#include <string>
 #include <vector>
 
-using Keyset = std::vector<char>;
+using CorpusChar = char;
+using CorpusString = std::string;
+
+using Keyset = std::vector<CorpusChar>;

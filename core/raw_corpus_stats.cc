@@ -8,7 +8,7 @@ RawCorpusStats::RawCorpusStats(std::istream& text_stream) {
   }
 }
 
-void RawCorpusStats::addWord(const std::string& word) {
+void RawCorpusStats::addWord(const CorpusString& word) {
   const int n = word.size();
   for (const char& c : word) {
     characters[c]++;

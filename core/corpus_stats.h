@@ -11,13 +11,13 @@ class CorpusStats {
  public:
   CorpusStats(Keyset const& keyset, RawCorpusStats const& raw_corpus_stats);
 
-  double getBigramPercentage(char c1, char c2) const;
+  double getBigramPercentage(CorpusChar c1, CorpusChar c2) const;
 
-  double getSkipgramPercentage(char c1, char c2) const;
+  double getSkipgramPercentage(CorpusChar c1, CorpusChar c2) const;
 
-  long long getBigramOccurance(char c1, char c2) const;
+  long long getBigramOccurance(CorpusChar c1, CorpusChar c2) const;
 
-  long long getSkipgramOccurance(char c1, char c2) const;
+  long long getSkipgramOccurance(CorpusChar c1, CorpusChar c2) const;
 
   const long long total_bigrams_, total_skipgrams_;
 
@@ -28,7 +28,7 @@ class CorpusStats {
   // Constructor helper
   static CharIdMapper const createCharIdMapper(Keyset const& keyset);
   static BigramOccurance const createBigramOccurance(
-      size_t keyset_size, std::unordered_map<std::string, long long> bigrams,
+      size_t keyset_size, std::unordered_map<CorpusString, long long> bigrams,
       CharIdMapper char_id);
 
   // Private field

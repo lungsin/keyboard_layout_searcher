@@ -5,7 +5,9 @@
 
 #include "core/types.h"
 
-using Bucket = std::vector<char>;
+using Bucket = std::vector<CorpusChar>;
+using BucketSpecCountId = int;
+using BucketSpecId = int;
 
 struct BucketSpec {
   int capacity, count;
@@ -19,10 +21,10 @@ class SearchState {
     END,
   };
 
-  SearchState(std::vector<char> const& keyset,
+  SearchState(Keyset const& keyset,
               std::vector<BucketSpec> const& bucket_specs);
 
-  void addKeyToCurrentBucket(char key);
+  void addKeyToCurrentBucket(CorpusChar key);
 
   void undoAddKeyToCurrentBucket();
 
@@ -33,7 +35,7 @@ class SearchState {
   // Action helper
   Phase getPhase() const;
 
-  std::vector<int> getUnusedBucketSpecIds() const;
+  std::vector<BucketSpecId> getUnusedBucketSpecIds() const;
 
   Keyset getUnusedKeys() const;
 
@@ -50,8 +52,8 @@ class SearchState {
   size_t target_total_buckets_;
 
   std::vector<std::vector<Bucket>> bucketsBySpec_;
-  std::vector<int> numBucketsAddedBySpec_;
-  std::vector<std::pair<int, int>> activeBucketIdStack_;
+  std::vector<BucketSpecId> numBucketsAddedBySpec_;
+  std::vector<std::pair<BucketSpecId, BucketSpecCountId>> activeBucketIdStack_;
 
-  std::unordered_set<char> unused_keys_;
+  std::unordered_set<CorpusChar> unused_keys_;
 };
