@@ -1,0 +1,10 @@
+cc_library(
+    name = "unicode",
+    srcs = ["unicode.cc"],
+    hdrs = ["unicode.h"],
+    visibility = [
+        "//core:__pkg__",
+        "//core/stats:__pkg__",
+    ],
+    deps = ["//core:types"],
+)

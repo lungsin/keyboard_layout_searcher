@@ -1,16 +1,60 @@
 #pragma once
 
-#include <unordered_set>
+#include <boost/container/static_vector.hpp>
+#include <boost/dynamic_bitset.hpp>
 #include <vector>
 
-#include "core/types.h"
-
-using Bucket = std::vector<CorpusChar>;
-using BucketSpecCountId = int;
-using BucketSpecId = int;
+using KeyId = size_t;
+using Bucket = std::vector<KeyId>;
+using BucketSpecCountId = size_t;
+using BucketSpecId = size_t;
+using BucketId = std::pair<BucketSpecId, BucketSpecCountId>;
 
 struct BucketSpec {
   int capacity, count;
+};
+
+// We only have 10 fingers.
+constexpr size_t kMaxBucketNumber = 10;
+constexpr size_t kMaxKeysetSize = 64;
+
+template <typename T>
+using static_vector = boost::container::static_vector<T, kMaxBucketNumber>;
+
+class BucketContainer {
+ public:
+  BucketContainer(const std::vector<BucketSpec>& bucket_specs);
+
+  void appendBucket(const BucketSpecId& bucket_spec_id);
+  void popBucket();
+
+  Bucket& getLatestBucket();
+
+  const Bucket& getLatestBucket() const;
+
+  bool empty() const;
+
+  bool isLatestBucketFull() const;
+
+  bool isGroupFull(size_t const& group_id) const;
+
+  bool isFull() const;
+
+  static_vector<Bucket> getAllBuckets() const;
+
+ private:
+  using FlattenId = size_t;
+
+  FlattenId getLatestFlattenId() const;
+
+  std::vector<BucketSpec> const bucket_specs_;
+
+  static_vector<Bucket> prealloc_buckets_;
+
+  static_vector<size_t> group_size_;
+  static_vector<size_t> group_capacity_;
+  static_vector<FlattenId> group_first_flatten_id_;
+  static_vector<BucketSpecId> bucket_spec_id_stack_;
 };
 
 class SearchState {
@@ -21,39 +65,36 @@ class SearchState {
     END,
   };
 
-  SearchState(Keyset const& keyset,
-              std::vector<BucketSpec> const& bucket_specs);
+  using KeysetIds = std::vector<KeyId>;
 
-  void addKeyToCurrentBucket(CorpusChar key);
+  SearchState(const size_t& keyset_size,
+              const std::vector<BucketSpec>& bucket_specs);
+
+  void addKeyToCurrentBucket(const KeyId& keyId);
 
   void undoAddKeyToCurrentBucket();
 
-  void addNewBucket(int bucketSpecId);
+  void addNewBucket(const BucketSpecId& bucketSpecId);
 
   void undoAddNewBucket();
 
   // Action helper
   Phase getPhase() const;
 
-  std::vector<BucketSpecId> getUnusedBucketSpecIds() const;
+  bool isBucketGroupFull(BucketSpecId const& id) const;
 
-  Keyset getUnusedKeys() const;
+  KeysetIds getUnusedKeys() const;
 
   // Helper
   Bucket const& getCurrentBucket() const;
 
-  std::vector<Bucket> getAllBuckets() const;
-
- private:
-  Bucket& getCurrentBucketInternal();
+  static_vector<Bucket> getAllBuckets() const;
 
   const std::vector<BucketSpec> bucket_specs_;
-  const Keyset keyset_;
-  size_t target_total_buckets_;
+  const size_t keyset_size_;
 
-  std::vector<std::vector<Bucket>> bucketsBySpec_;
-  std::vector<BucketSpecId> numBucketsAddedBySpec_;
-  std::vector<std::pair<BucketSpecId, BucketSpecCountId>> activeBucketIdStack_;
+ private:
+  BucketContainer bucket_container_;
 
-  std::unordered_set<CorpusChar> unused_keys_;
+  boost::dynamic_bitset<> unused_keys_bitset_;
 };

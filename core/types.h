@@ -1,9 +1,13 @@
 #pragma once
 
 #include <string>
+#include <unordered_map>
 #include <vector>
 
-using CorpusChar = char;
-using CorpusString = std::string;
+using WideChar = char32_t;
+using WideString = std::u32string;
 
-using Keyset = std::vector<CorpusChar>;
+template <class T>
+using FrequencyMap = std::unordered_map<T, long long>;
+
+using WideNgramFrequencyMap = FrequencyMap<WideString>;

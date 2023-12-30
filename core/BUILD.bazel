@@ -6,48 +6,32 @@ cc_binary(
     data = ["//static:corpus_data"],
     deps = [
         "//core/search",
+        "@boost//:locale",
     ],
 )
 
 cc_library(
-    name = "corpus_stats",
-    srcs = ["corpus_stats.cc"],
-    hdrs = ["corpus_stats.h"],
-    visibility = ["//core/search:__pkg__"],
-    deps = [
-        "raw_corpus_stats",
-        "types",
-        "@nlohmann_json//:json",
+    name = "keyset_config",
+    srcs = ["keyset_config.cc"],
+    hdrs = ["keyset_config.h"],
+    visibility = [
+        "//core/search:__pkg__",
     ],
-)
-
-cc_test(
-    name = "corpus_stats_test",
-    size = "small",
-    srcs = ["corpus_stats_test.cc"],
-    deps = [
-        "corpus_stats",
-        "@googletest//:gtest_main",
-    ],
-)
-
-cc_library(
-    name = "raw_corpus_stats",
-    srcs = ["raw_corpus_stats.cc"],
-    hdrs = ["raw_corpus_stats.h"],
     deps = [
         "types",
         "@nlohmann_json//:json",
     ],
 )
 
-cc_test(
-    name = "raw_corpus_stats_test",
-    size = "small",
-    srcs = ["raw_corpus_stats_test.cc"],
+cc_library(
+    name = "keyset_config_transformator",
+    hdrs = ["keyset_config_transformator.h"],
+    visibility = [
+        "//core/search:__pkg__",
+    ],
     deps = [
-        "raw_corpus_stats",
-        "@googletest//:gtest_main",
+        "keyset_config",
+        "//core/unicode",
     ],
 )
 
@@ -55,5 +39,7 @@ cc_library(
     name = "types",
     srcs = [],
     hdrs = ["types.h"],
-    visibility = ["//visibility:public"],
+    visibility = [
+        "//visibility:public",
+    ],
 )

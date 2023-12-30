@@ -2,32 +2,37 @@
 
 #include <iostream>
 
-LayoutWithMetric search(Keyset const& keyset,
+#include "core/keyset_config_transformator.h"
+
+LayoutWithMetric search(KeysetConfig const& keyset_config,
                         std::vector<BucketSpec> const& bucket_specs,
                         RawCorpusStats const& raw_corpus_stats,
                         Threshold const& threshold) {
   for (auto x : bucket_specs) std::cerr << x.capacity << std::endl;
 
-  // TODO: sort keyset by occurance
-  SearchState state(keyset, bucket_specs);
-  CorpusStats corpus_stats(keyset, raw_corpus_stats);
-  ThresholdOcc threshold_occ(
-      {(long long)threshold.sfb * corpus_stats.total_bigrams_,
-       (long long)threshold.sfs * corpus_stats.total_skipgrams_});
-  BestPairSet<long long, long long, std::vector<Bucket>> best_result;
+  KeysetConfigTransformator<RawCorpusStats> transformator;
+  FastReadCorpusStats fast_read_corpus_stats(
+      transformator.apply_config(keyset_config).get());
+
+  SearchState state(fast_read_corpus_stats.getKeysetSize(), bucket_specs);
+
+  ThresholdFreq threshold_freq(
+      threshold.sfb * fast_read_corpus_stats.getTotalBigrams(),
+      threshold.sfs * fast_read_corpus_stats.getTotalSkipgrams());
+
+  BestBucketMetricSet best_result;
   SearchMetadata metadata;
-  search(state, corpus_stats, threshold_occ, SearchStats({0LL, 0LL}),
+  search(state, fast_read_corpus_stats, threshold_freq, SearchStats({0LL, 0LL}),
          best_result, metadata);
 
   std::cerr << "Iteration number: " << metadata.num_iteration << std::endl;
   return best_result.getAllData();
 }
 
-void search(SearchState& state, CorpusStats const& corpus_stats,
-            ThresholdOcc const& threshold, SearchStats const& search_stats,
-            BestPairSet<long long, long long, std::vector<Bucket>>& best_result,
-            SearchMetadata& metadata) {
-  metadata.num_iteration++;
+void search(SearchState& state, FastReadCorpusStats const& corpus_stats,
+            ThresholdFreq const& threshold, SearchStats const& search_stats,
+            BestBucketMetricSet& best_result, SearchMetadata& metadata) {
+  ++metadata.num_iteration;
 
   // pruning
   if (search_stats.sfb > threshold.sfb || search_stats.sfs > threshold.sfs) {
@@ -44,12 +49,15 @@ void search(SearchState& state, CorpusStats const& corpus_stats,
   // recursion
   switch (state.getPhase()) {
     case SearchState::Phase::ADD_BUCKET: {
-      for (auto const& bucket_spec_id : state.getUnusedBucketSpecIds()) {
-        state.addNewBucket(bucket_spec_id);
-        search(state, corpus_stats, threshold, search_stats, best_result,
-               metadata);
-        state.undoAddNewBucket();
-      }
+      // TODO: experiment with generator to do this loop
+      for (size_t bucket_spec_id = 0;
+           bucket_spec_id < state.bucket_specs_.size(); ++bucket_spec_id)
+        if (state.isBucketGroupFull(bucket_spec_id)) {
+          state.addNewBucket(bucket_spec_id);
+          search(state, corpus_stats, threshold, search_stats, best_result,
+                 metadata);
+          state.undoAddNewBucket();
+        }
       break;
     }
     case SearchState::Phase::ADD_KEY: {
@@ -58,8 +66,8 @@ void search(SearchState& state, CorpusStats const& corpus_stats,
       for (auto const& key : unused_keys) {
         SearchStats new_stats = search_stats;
         for (auto const other_key : state.getCurrentBucket()) {
-          new_stats.sfb += corpus_stats.getBigramOccurance(other_key, key);
-          new_stats.sfs += corpus_stats.getSkipgramOccurance(other_key, key);
+          new_stats.sfb += corpus_stats.getBigramFreq(other_key, key);
+          new_stats.sfs += corpus_stats.getBigramFreq(other_key, key);
         }
         state.addKeyToCurrentBucket(key);
         search(state, corpus_stats, threshold, new_stats, best_result,

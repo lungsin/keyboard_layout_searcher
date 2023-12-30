@@ -2,7 +2,10 @@ cc_library(
     name = "search_state",
     srcs = ["search_state.cc"],
     hdrs = ["search_state.h"],
-    deps = ["//core:types"],
+    deps = [
+        "//core:types",
+        "@boost//:dynamic_bitset",
+    ],
 )
 
 cc_library(
@@ -12,8 +15,10 @@ cc_library(
     visibility = ["//core:__pkg__"],
     deps = [
         "search_state",
-        "//core:corpus_stats",
+        "//core:keyset_config",
+        "//core:keyset_config_transformator",
         "//core/data_structure:best_pair_set",
+        "//core/stats:fast_read_corpus_stats",
     ],
 )
 

@@ -1,0 +1,47 @@
+cc_library(
+    name = "raw_corpus_stats",
+    srcs = ["raw_corpus_stats.cc"],
+    hdrs = ["raw_corpus_stats.h"],
+    visibility = ["//core:__pkg__"],
+    deps = [
+        "utils",
+        "//core:types",
+        "//core/unicode",
+        "@nlohmann_json//:json",
+    ],
+)
+
+cc_test(
+    name = "raw_corpus_stats_test",
+    size = "small",
+    srcs = ["raw_corpus_stats_test.cc"],
+    deps = [
+        "raw_corpus_stats",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "fast_read_corpus_stats",
+    srcs = ["fast_read_corpus_stats.cc"],
+    hdrs = ["fast_read_corpus_stats.h"],
+    visibility = [
+        "//core:__pkg__",
+        "//core/search:__pkg__",
+    ],
+    deps = [
+        "raw_corpus_stats",
+        "//core:types",
+        "@boost//:multi_array",
+    ],
+)
+
+cc_library(
+    name = "utils",
+    srcs = ["utils.cc"],
+    hdrs = ["utils.h"],
+    deps = [
+        "//core:types",
+        "@boost//:algorithm",
+    ],
+)
