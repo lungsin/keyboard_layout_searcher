@@ -13,12 +13,29 @@ RawCorpusStats::RawCorpusStats(std::istream& text_stream) {
 }
 
 RawCorpusStats::RawCorpusStats(const json& j) {
-  j.at("char_freqs").get_to(char_freqs_);
-  j.at("bigram_freqs").get_to(bigram_freqs_);
-  j.at("skipgram_freqs").get_to(skipgram_freqs_);
-  j.at("skipgram2_freqs").get_to(skipgram2_freqs_);
-  j.at("skipgram3_freqs").get_to(skipgram3_freqs_);
-  j.at("trigram_freqs").get_to(trigram_freqs_);
+  auto process_json_ngram_freqs = [&](std::string const& json_key,
+                                      WideNgramFrequencyMap& result) {
+    FrequencyMap<std::string> narrow_map;
+    j.at(json_key).get_to(narrow_map);
+    result = unicode::toWide(narrow_map);
+  };
+
+  auto process_json_char_freqs = [&](std::string const& json_key,
+                                     FrequencyMap<WideChar>& result) {
+    WideNgramFrequencyMap wide_map;
+    process_json_ngram_freqs(json_key, wide_map);
+    for (auto const& [ngram, freq] : wide_map) {
+      if (ngram.size() != 1) continue;
+      result[ngram[0]] += freq;
+    }
+  };
+
+  process_json_char_freqs("char_freqs", char_freqs_);
+  process_json_ngram_freqs("bigram_freqs", bigram_freqs_);
+  process_json_ngram_freqs("skipgram_freqs", skipgram_freqs_);
+  process_json_ngram_freqs("skipgram2_freqs", skipgram2_freqs_);
+  process_json_ngram_freqs("skipgram3_freqs", skipgram3_freqs_);
+  process_json_ngram_freqs("trigram_freqs", trigram_freqs_);
 
   total_chars_ = getTotalFreqs(char_freqs_);
   total_bigrams_ = getTotalFreqs(bigram_freqs_);
@@ -26,6 +43,23 @@ RawCorpusStats::RawCorpusStats(const json& j) {
   total_skipgrams2_ = getTotalFreqs(skipgram2_freqs_);
   total_skipgrams3_ = getTotalFreqs(skipgram3_freqs_);
   total_trigrams_ = getTotalFreqs(trigram_freqs_);
+}
+
+RawCorpusStats RawCorpusStats::fromTextStream(std::istream& text_stream) {
+  return RawCorpusStats(text_stream);
+}
+RawCorpusStats RawCorpusStats::fromTextFile(std::string const& text_path) {
+  std::ifstream text_stream(text_path);
+  return fromTextStream(text_stream);
+}
+RawCorpusStats RawCorpusStats::fromJsonStream(std::istream& json_stream) {
+  json j;
+  json_stream >> j;
+  return RawCorpusStats(j);
+}
+RawCorpusStats RawCorpusStats::fromJsonFile(std::string const& json_path) {
+  std::ifstream json_stream(json_path);
+  return fromJsonStream(json_stream);
 }
 
 void RawCorpusStats::addWord(const WideString& word) {
@@ -193,12 +227,12 @@ void to_json(json& j, const RawCorpusStats& obj) {
       {"total_skipgrams2", obj.getTotalSkipgrams2()},
       {"total_skipgrams3", obj.getTotalSkipgrams3()},
       {"total_trigrams", obj.getTotalTrigrams()},
-      {"char_freqs", obj.getCharFreqPairs()},
-      {"bigram_freqs", obj.getBigramFreqPairs()},
-      {"skipgram_freqs", obj.getSkipgramFreqPairs()},
-      {"skipgram2_freqs", obj.getSkipgram2FreqPairs()},
-      {"skipgram3_freqs", obj.getSkipgram3FreqPairs()},
-      {"trigram_freqs", obj.getTrigramFreqPairs()},
+      {"char_freqs", unicode::toNarrow(obj.getCharFreqPairs())},
+      {"bigram_freqs", unicode::toNarrow(obj.getBigramFreqPairs())},
+      {"skipgram_freqs", unicode::toNarrow(obj.getSkipgramFreqPairs())},
+      {"skipgram2_freqs", unicode::toNarrow(obj.getSkipgram2FreqPairs())},
+      {"skipgram3_freqs", unicode::toNarrow(obj.getSkipgram3FreqPairs())},
+      {"trigram_freqs", unicode::toNarrow(obj.getTrigramFreqPairs())},
   };
 }
 

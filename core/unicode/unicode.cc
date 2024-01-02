@@ -20,6 +20,14 @@ WideNgramFrequencyMap toWide(const FrequencyMap<std::string>& m) {
   return wm;
 }
 
+FrequencyMap<std::string> toNarrow(const FrequencyMap<WideChar>& wm) {
+  FrequencyMap<std::string> m;
+  for (const auto& [wc, freq] : wm) {
+    m[toNarrow(WideString({wc}))] += freq;
+  }
+  return m;
+}
+
 FrequencyMap<std::string> toNarrow(const WideNgramFrequencyMap& wm) {
   FrequencyMap<std::string> m;
   for (const auto& [ws, freq] : wm) {

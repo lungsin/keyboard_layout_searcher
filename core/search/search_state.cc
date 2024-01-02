@@ -17,9 +17,9 @@ BucketContainer::BucketContainer(const std::vector<BucketSpec>& bucket_specs)
       group_first_flatten_id_(bucket_specs.size()),
       bucket_spec_id_stack_() {
   // init prealloc_buckets_
-  for (int i = 0; i < bucket_specs.size(); ++i) {
+  for (size_t i = 0; i < bucket_specs.size(); ++i) {
     const auto& bucket_spec = bucket_specs[i];
-    for (int j = 0; j < bucket_spec.count; ++j) {
+    for (size_t j = 0; j < bucket_spec.count; ++j) {
       prealloc_buckets_.emplace_back();
       prealloc_buckets_.back().reserve(bucket_spec.capacity);
     }

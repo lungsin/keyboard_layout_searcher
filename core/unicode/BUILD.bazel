@@ -6,5 +6,8 @@ cc_library(
         "//core:__pkg__",
         "//core/stats:__pkg__",
     ],
-    deps = ["//core:types"],
+    deps = [
+        "//core:types",
+        "@boost//:locale",
+    ],
 )

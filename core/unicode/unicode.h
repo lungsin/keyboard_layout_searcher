@@ -10,6 +10,8 @@ std::string toNarrow(const WideString &ws);
 
 WideNgramFrequencyMap toWide(const FrequencyMap<std::string> &m);
 
+FrequencyMap<std::string> toNarrow(const FrequencyMap<WideChar> &wm);
+
 FrequencyMap<std::string> toNarrow(const WideNgramFrequencyMap &wm);
 
 WideString toLowercase(const WideChar &c);

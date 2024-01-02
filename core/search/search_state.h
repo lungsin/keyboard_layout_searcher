@@ -11,7 +11,7 @@ using BucketSpecId = size_t;
 using BucketId = std::pair<BucketSpecId, BucketSpecCountId>;
 
 struct BucketSpec {
-  int capacity, count;
+  size_t capacity, count;
 };
 
 // We only have 10 fingers.

@@ -1,0 +1,15 @@
+{
+  "keyset": "abcdefghijklmnopqrstuvwxyz',.;",
+  "replacement": {
+    "one_to_one": {
+      "from": "´÷‘’–ʹ͵",
+      "to": "'/''-''"
+    },
+    "punct_unshifted_replacement": {
+      "from": "{}?+_|\"<>:~“”«»",
+      "to": "[]/=-\\',.;`''''"
+    },
+    "letters_to_lowercase": "abcdefghijklmnopqrstuvwxyz",
+    "replacements": [{ "from": "…", "to": "..." }]
+  }
+}

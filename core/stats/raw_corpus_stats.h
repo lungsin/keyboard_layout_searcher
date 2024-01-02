@@ -13,6 +13,11 @@ class RawCorpusStats {
   RawCorpusStats(std::istream& text_stream);
   RawCorpusStats(const json& j);
 
+  static RawCorpusStats fromTextStream(std::istream& text_stream);
+  static RawCorpusStats fromTextFile(std::string const& text_path);
+  static RawCorpusStats fromJsonStream(std::istream& json_stream);
+  static RawCorpusStats fromJsonFile(std::string const& json_path);
+
   void addWord(const WideString& word);
   void addWord(const std::string& word);
 

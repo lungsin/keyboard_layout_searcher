@@ -2,7 +2,6 @@
 
 #include <string>
 #include <unordered_map>
-#include <vector>
 
 using WideChar = char32_t;
 using WideString = std::u32string;
