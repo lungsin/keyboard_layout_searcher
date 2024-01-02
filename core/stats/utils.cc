@@ -26,7 +26,13 @@ WideNgramFrequencyMap removeChar(const WideNgramFrequencyMap& freq_map,
                                  const WideChar& remove_char) {
   WideNgramFrequencyMap result_map;
   for (const auto& [ngram, freq] : freq_map) {
-    const bool is_contain = ngram.find(remove_char) == std::string::npos;
+    bool is_contain = false;
+    for (WideChar const& ngram_char : ngram) {
+      if (ngram_char == remove_char) {
+        is_contain = true;
+        break;
+      }
+    }
     if (is_contain) continue;
     result_map[ngram] += freq;
   }

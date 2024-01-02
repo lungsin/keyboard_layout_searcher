@@ -1,9 +1,10 @@
 
-#include <boost/dynamic_bitset.hpp>
+#include <boost/locale.hpp>
 #include <fstream>
 #include <iostream>
 #include <string>
 
+#include "core/search/search.h"
 #include "core/stats/raw_corpus_stats.h"
 
 using namespace std;
@@ -34,9 +35,18 @@ RawCorpusStats loadRawCorpusStats(std::filesystem::path text_path,
   }
 }
 
+KeysetConfig loadKeysetConfig(std::filesystem::path const& config_path) {
+  json j;
+  std::ifstream config_stream(config_path);
+  config_stream >> j;
+  return j.template get<KeysetConfig>();
+}
+
 int main(int, char**) {
-  // Keyset keyset(KEYSET.begin(), KEYSET.end());
-  // std::vector<BucketSpec> bucket_specs = {{3, 6}, {6, 2}};
+  // Create system default locale
+  boost::locale::generator gen;
+  locale loc = gen("");
+  locale::global(loc);
 
   std::filesystem::path raw_shai_path =
       toWorkingDirectory("static/stats/shai/shai.raw.json");
@@ -47,19 +57,21 @@ int main(int, char**) {
   RawCorpusStats raw_corpus_stats =
       loadRawCorpusStats(text_shai_path, raw_shai_path);
 
-  // Threshold threshold(0.01, 0.065);
-  // auto result = search(keyset, bucket_specs, raw_corpus_stats,
-  // threshold);
+  KeysetConfig keyset_config =
+      loadKeysetConfig("static/keyset_config/default.json");
+  std::vector<BucketSpec> bucket_specs = {{3, 6}, {6, 2}};
+  Threshold threshold(0.01, 0.065);
+  auto result =
+      search(keyset_config, bucket_specs, raw_corpus_stats, threshold);
 
-  // std::ofstream out_file("result.txt");
+  std::ofstream out_file(toWorkingDirectory("result.txt"));
 
-  // for (auto [sfb, sfs, layout] : result) {
-  //   out_file << sfb << " " << sfs << " ";
-  //   for (auto bucket : layout) {
-  //     string s(bucket.begin(), bucket.end());
-  //     out_file << s << " ";
-  //   }
-  //   out_file << endl;
-  // }
+  for (auto [sfb, sfs, layout] : result) {
+    out_file << sfb << " " << sfs << " ";
+    for (auto bucket : layout) {
+      out_file << bucket << " ";
+    }
+    out_file << endl;
+  }
   return 0;
 }

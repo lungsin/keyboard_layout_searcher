@@ -8,13 +8,19 @@
 #include "core/types.h"
 #include "raw_corpus_stats.h"
 
+WideString sortKeysetByOccurance(WideString const& keyset,
+                                 RawCorpusStats const& stats);
+
 class FastReadCorpusStats {
  public:
   using CharId = int;
 
-  FastReadCorpusStats(RawCorpusStats const& raw_corpus_stats);
+  FastReadCorpusStats(RawCorpusStats const& raw_corpus_stats,
+                      WideString const& keyset);
 
-  std::optional<int> getCharId(WideChar const& c) const;
+  std::optional<CharId> getCharId(WideChar const& c) const;
+  WideChar getCharFromId(CharId const& id) const;
+  WideString getKeyset() const;
   size_t getKeysetSize() const;
 
   long long getTotalChars() const;
@@ -35,7 +41,7 @@ class FastReadCorpusStats {
  private:
   class CharIdMap : public std::unordered_map<WideChar, CharId> {
    public:
-    CharIdMap(const FrequencyMap<WideChar>& freq_map);
+    CharIdMap(WideString const& keyset);
   };
 
   class BigramFrequencyTable : public boost::multi_array<long long, 2> {
@@ -56,6 +62,7 @@ class FastReadCorpusStats {
                        const CharIdMap& char_id_map);
   };
 
+  WideString keyset_;
   CharIdMap char_id_map_;
 
   long long total_chars_ = 0;

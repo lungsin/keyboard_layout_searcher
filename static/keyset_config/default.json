@@ -9,7 +9,11 @@
       "from": "{}?+_|\"<>:~“”«»",
       "to": "[]/=-\\',.;`''''"
     },
-    "letters_to_lowercase": "abcdefghijklmnopqrstuvwxyz",
-    "replacements": [{ "from": "…", "to": "..." }]
+    "letters_to_lowercase": {
+      "letters": "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    },
+    "one_to_many": {
+      "replacements": [{ "from": "…", "to": "..." }]
+    }
   }
 }

@@ -1,5 +1,7 @@
 #include "keyset_config.h"
 
+#include "unicode/unicode.h"
+
 void to_json(json& j, const KeysetOneToOneReplacement& c) {
   j = json{
       {"from", c.from},
@@ -19,31 +21,36 @@ void to_json(json& j, const KeysetOneToOneReplacements& c) {
     to += replacement.to;
   }
   j = json{
-      {"from", from},
-      {"to", to},
+      {"from", unicode::toNarrow(from)},
+      {"to", unicode::toNarrow(to)},
   };
 }
 
 void from_json(const json& j, KeysetOneToOneReplacements& c) {
-  WideString from, to;
-  j.at("from").get_to(from);
-  j.at("to").get_to(to);
+  std::string from_narrow, to_narrow;
+  j.at("from").get_to(from_narrow);
+  j.at("to").get_to(to_narrow);
+  WideString from = unicode::toWide(from_narrow),
+             to = unicode::toWide(to_narrow);
   c.replacements.clear();
-  for (size_t i = 0; i < std::min(from.size(), to.size()); ++i) {
-    c.replacements.emplace_back(from[i], to[i]);
+  for (size_t i = 0; i < std::min(from_narrow.size(), to_narrow.size()); ++i) {
+    c.replacements.emplace_back(from_narrow[i], to_narrow[i]);
   }
 }
 
 void to_json(json& j, const KeysetOneToManyReplacement& c) {
   j = json{
-      {"from", c.from},
-      {"to", c.to},
+      {"from", unicode::toNarrow(WideString({c.from}))},
+      {"to", unicode::toNarrow(c.to)},
   };
 }
 
 void from_json(const json& j, KeysetOneToManyReplacement& c) {
-  j.at("from").get_to(c.from);
-  j.at("to").get_to(c.to);
+  std::string from, to;
+  j.at("from").get_to(from);
+  j.at("to").get_to(to);
+  c.from = unicode::toWide(from)[0];
+  c.to = unicode::toWide(to);
 }
 
 void to_json(json& j, const KeysetOneToManyReplacements& c) {
@@ -58,12 +65,14 @@ void from_json(const json& j, KeysetOneToManyReplacements& c) {
 
 void to_json(json& j, const LettersToLowercaseReplacement& c) {
   j = json{
-      {"letters", c.letters},
+      {"letters", unicode::toNarrow(c.letters)},
   };
 }
 
 void from_json(const json& j, LettersToLowercaseReplacement& c) {
-  j.at("letters").get_to(c.letters);
+  std::string letters;
+  j.at("letters").get_to(letters);
+  c.letters = unicode::toWide(letters);
 }
 
 void to_json(json& j, const KeysetReplacementConfig& c) {
@@ -84,12 +93,14 @@ void from_json(const json& j, KeysetReplacementConfig& c) {
 
 void to_json(json& j, const KeysetConfig& c) {
   j = json{
-      {"keyset", c.keyset},
+      {"keyset", unicode::toNarrow(c.keyset)},
       {"replacement", c.replacement},
   };
 }
 
 void from_json(const json& j, KeysetConfig& c) {
-  j.at("keyset").get_to(c.keyset);
+  std::string keyset_narrow;
+  j.at("keyset").get_to(keyset_narrow);
+  c.keyset = unicode::toWide(keyset_narrow);
   j.at("replacement").get_to(c.replacement);
 }

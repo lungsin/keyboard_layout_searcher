@@ -18,11 +18,12 @@ struct SearchStats {
 };
 
 struct SearchMetadata {
-  int num_iteration;
+  size_t num_iteration = 0;
+  size_t peak_best_results_size = 0;
 };
 
 using LayoutWithMetric =
-    std::vector<std::tuple<long long, long long, static_vector<Bucket>>>;
+    std::vector<std::tuple<long long, long long, static_vector<std::string>>>;
 
 using BestBucketMetricSet =
     BestPairSet<long long, long long, static_vector<Bucket>>;

@@ -1,7 +1,19 @@
 #include "fast_read_corpus_stats.h"
 
-FastReadCorpusStats::FastReadCorpusStats(RawCorpusStats const& raw_corpus_stats)
-    : char_id_map_(raw_corpus_stats.getCharFreqPairs()),
+WideString sortKeysetByOccurance(WideString const& keyset,
+                                 RawCorpusStats const& stats) {
+  WideString sorted_keyset(keyset);
+  std::sort(sorted_keyset.begin(), sorted_keyset.end(),
+            [&](WideChar const& c1, WideChar const& c2) {
+              return stats.getCharFreq(c1) > stats.getCharFreq(c2);
+            });
+  return sorted_keyset;
+}
+
+FastReadCorpusStats::FastReadCorpusStats(RawCorpusStats const& raw_corpus_stats,
+                                         WideString const& keyset)
+    : keyset_(sortKeysetByOccurance(keyset, raw_corpus_stats)),
+      char_id_map_(keyset_),
       total_chars_(raw_corpus_stats.getTotalChars()),
       total_bigrams_(raw_corpus_stats.getTotalBigrams()),
       total_skipgrams_(raw_corpus_stats.getTotalSkipgrams()),
@@ -19,6 +31,12 @@ std::optional<int> FastReadCorpusStats::getCharId(WideChar const& c) const {
   if (!char_id_map_.contains(c)) return std::nullopt;
   return char_id_map_.at(c);
 }
+
+WideChar FastReadCorpusStats::getCharFromId(CharId const& id) const {
+  return keyset_[id];
+}
+
+WideString FastReadCorpusStats::getKeyset() const { return keyset_; }
 
 size_t FastReadCorpusStats::getKeysetSize() const {
   return char_id_map_.size();
@@ -66,12 +84,9 @@ long long FastReadCorpusStats::getTrigramFreq(const CharId& c1,
   return trigram_freqs_[c1][c2][c3];
 }
 
-FastReadCorpusStats::CharIdMap::CharIdMap(
-    const FrequencyMap<WideChar>& freq_map) {
-  CharId id = 0;
-  for (const WideChar& c : freq_map | std::views::keys) {
-    this->insert_or_assign(c, id);
-    ++id;
+FastReadCorpusStats::CharIdMap::CharIdMap(WideString const& keyset) {
+  for (size_t i = 0; i < keyset.size(); i++) {
+    this->insert_or_assign(keyset[i], i);
   }
 }
 
@@ -88,7 +103,7 @@ FastReadCorpusStats::BigramFrequencyTable::BigramFrequencyTable(
     : boost::multi_array<long long, 2>(
           boost::extents[char_id_map.size()][char_id_map.size()]) {
   for (const auto& [s, freq] : freq_map) {
-    const CharId id1 = char_id_map.at(0), id2 = char_id_map.at(1);
+    const CharId id1 = char_id_map.at(s[0]), id2 = char_id_map.at(s[1]);
     (*this)[id1][id2] += freq;
   }
 }
@@ -99,8 +114,8 @@ FastReadCorpusStats::TrigramFrequencyTable::TrigramFrequencyTable(
           boost::extents[char_id_map.size()][char_id_map.size()]
                         [char_id_map.size()]) {
   for (const auto& [s, freq] : freq_map) {
-    const CharId id1 = char_id_map.at(0), id2 = char_id_map.at(1),
-                 id3 = char_id_map.at(2);
+    const CharId id1 = char_id_map.at(s[0]), id2 = char_id_map.at(s[1]),
+                 id3 = char_id_map.at(s[2]);
     (*this)[id1][id2][id3] += freq;
   }
 }

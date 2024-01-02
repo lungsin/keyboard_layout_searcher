@@ -73,7 +73,8 @@ static_vector<Bucket> BucketContainer::getAllBuckets() const {
 
 BucketContainer::FlattenId BucketContainer::getLatestFlattenId() const {
   const auto& bucket_spec_id = bucket_spec_id_stack_.back();
-  return group_first_flatten_id_[bucket_spec_id] + group_size_[bucket_spec_id];
+  return group_first_flatten_id_[bucket_spec_id] + group_size_[bucket_spec_id] -
+         1;
 }
 
 SearchState::SearchState(const size_t& keyset_size,

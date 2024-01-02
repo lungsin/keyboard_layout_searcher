@@ -11,57 +11,49 @@ concept KeysetConfigTransformable =
     };
 
 template <KeysetConfigTransformable T>
-struct KeysetConfigTransformator {
-  T data;
-
-  KeysetConfigTransformator apply_config(const KeysetConfig& config) const {
-    return replace(config.replacement).whitelistChars(config.keyset);
+void replace(const KeysetOneToOneReplacements& config, T& data) {
+  for (const auto& [from, to] : config.replacements) {
+    data.replaceChar(from, to);
   }
+}
 
-  KeysetConfigTransformator replace(
-      const KeysetReplacementConfig& config) const {
-    return replace(config.one_to_one)
-        .replace(config.letters_to_lowercase)
-        .replace(config.punct_unshifted_replacement);
-  }
+template <KeysetConfigTransformable T>
+void replace(const KeysetOneToManyReplacements& config, T& data) {
+  // TODO: support one to many replacements
+}
 
-  KeysetConfigTransformator replace(
-      const KeysetOneToOneReplacements& config) const {
-    T new_stats = data;
-    for (const auto& [from, to] : config.replacements) {
-      new_stats.replaceChar(from, to);
+template <KeysetConfigTransformable T>
+void replace(const LettersToLowercaseReplacement& config, T& data) {
+  KeysetOneToOneReplacements one_to_one;
+  KeysetOneToManyReplacements one_to_many;
+  for (const auto& letter : config.letters) {
+    const WideString lowercase = unicode::toLowercase(letter);
+    if (lowercase.size() == 1) {
+      one_to_one.replacements.push_back(
+          KeysetOneToOneReplacement({letter, lowercase[0]}));
+    } else {
+      one_to_many.replacements.push_back(
+          KeysetOneToManyReplacement({letter, lowercase}));
     }
-    return KeysetConfigTransformator({new_stats});
   }
+  replace(one_to_one, data);
+  replace(one_to_many, data);
+}
 
-  KeysetConfigTransformator replace(
-      const KeysetOneToManyReplacements& config) const {
-    // TODO: support one to many replacements
-    return *this;
-  }
+template <KeysetConfigTransformable T>
+void whitelistChars(const WideString& whitelist, T& data) {
+  data.whitelistChars(whitelist);
+}
 
-  KeysetConfigTransformator replace(
-      const LettersToLowercaseReplacement& config) const {
-    KeysetOneToOneReplacements one_to_one;
-    KeysetOneToManyReplacements one_to_many;
-    for (const auto& letter : config.letters) {
-      const WideString lowercase = unicode::toLowercase(letter);
-      if (lowercase.size() == 1) {
-        one_to_one.replacements.push_back(
-            KeysetOneToOneReplacement({letter, lowercase[0]}));
-      } else {
-        one_to_many.replacements.push_back(
-            KeysetOneToManyReplacement({letter, lowercase}));
-      }
-    }
-    return replace(one_to_one).replace(one_to_many);
-  }
+template <KeysetConfigTransformable T>
+void replace(const KeysetReplacementConfig& config, T& data) {
+  replace(config.one_to_one, data);
+  replace(config.letters_to_lowercase, data);
+  replace(config.punct_unshifted_replacement, data);
+}
 
-  KeysetConfigTransformator whitelistChars(const WideString& whitelist) const {
-    T new_stats = data;
-    new_stats.whitelistChars(whitelist);
-    return KeysetConfigTransformator({new_stats});
-  }
-
-  T get() const { return data; }
-};
+template <KeysetConfigTransformable T>
+void apply_config(const KeysetConfig& config, T& data) {
+  replace(config.replacement, data);
+  whitelistChars(config.keyset, data);
+}

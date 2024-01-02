@@ -81,6 +81,8 @@ class BestPairSet {
     return result;
   }
 
+  size_t size() const { return store_.size(); }
+
  private:
   std::map<MetricKey, std::vector<Data>> store_;
 };

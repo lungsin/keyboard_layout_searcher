@@ -30,6 +30,13 @@ RawCorpusStats::RawCorpusStats(const json& j) {
     }
   };
 
+  j.at("total_chars").get_to(total_chars_);
+  j.at("total_bigrams").get_to(total_bigrams_);
+  j.at("total_skipgrams").get_to(total_skipgrams_);
+  j.at("total_skipgrams2").get_to(total_skipgrams2_);
+  j.at("total_skipgrams3").get_to(total_skipgrams3_);
+  j.at("total_trigrams").get_to(total_trigrams_);
+
   process_json_char_freqs("char_freqs", char_freqs_);
   process_json_ngram_freqs("bigram_freqs", bigram_freqs_);
   process_json_ngram_freqs("skipgram_freqs", skipgram_freqs_);
@@ -37,12 +44,12 @@ RawCorpusStats::RawCorpusStats(const json& j) {
   process_json_ngram_freqs("skipgram3_freqs", skipgram3_freqs_);
   process_json_ngram_freqs("trigram_freqs", trigram_freqs_);
 
-  total_chars_ = getTotalFreqs(char_freqs_);
-  total_bigrams_ = getTotalFreqs(bigram_freqs_);
-  total_skipgrams_ = getTotalFreqs(skipgram_freqs_);
-  total_skipgrams2_ = getTotalFreqs(skipgram2_freqs_);
-  total_skipgrams3_ = getTotalFreqs(skipgram3_freqs_);
-  total_trigrams_ = getTotalFreqs(trigram_freqs_);
+  assert(total_chars_ == getTotalFreqs(char_freqs_));
+  assert(total_bigrams_ == getTotalFreqs(bigram_freqs_));
+  assert(total_skipgrams_ == getTotalFreqs(skipgram_freqs_));
+  assert(total_skipgrams2_ == getTotalFreqs(skipgram2_freqs_));
+  assert(total_skipgrams3_ == getTotalFreqs(skipgram3_freqs_));
+  assert(total_trigrams_ == getTotalFreqs(trigram_freqs_));
 }
 
 RawCorpusStats RawCorpusStats::fromTextStream(std::istream& text_stream) {
@@ -82,11 +89,11 @@ void RawCorpusStats::addWord(const WideString& word) {
   }
 
   total_chars_ += n;
-  total_bigrams_ += n - 1;
-  total_trigrams_ += n - 2;
-  total_skipgrams_ += n - 2;
-  total_skipgrams2_ += n - 3;
-  total_skipgrams3_ += n - 4;
+  total_bigrams_ += std::max(n - 1, 0);
+  total_trigrams_ += std::max(n - 2, 0);
+  total_skipgrams_ += std::max(n - 2, 0);
+  total_skipgrams2_ += std::max(n - 3, 0);
+  total_skipgrams3_ += std::max(n - 4, 0);
 }
 
 void RawCorpusStats::addWord(const std::string& word) {
@@ -214,8 +221,16 @@ void RawCorpusStats::removeChar(const WideChar& c) {
 void RawCorpusStats::whitelistChars(const WideString& whitelist) {
   std::unordered_set<WideChar> whitelist_set(whitelist.begin(),
                                              whitelist.end());
-  for (const WideChar& c : char_freqs_ | std::views::keys) {
-    if (!whitelist_set.contains(c)) removeChar(c);
+
+  auto non_whitelisted_chars_r = char_freqs_ | std::views::keys |
+                                 std::views::filter([&](WideChar const& c) {
+                                   return !whitelist_set.contains(c);
+                                 });
+  std::vector<WideChar> non_whitelisted_chars(non_whitelisted_chars_r.begin(),
+                                              non_whitelisted_chars_r.end());
+
+  for (const WideChar& c : non_whitelisted_chars) {
+    removeChar(c);
   }
 }
 

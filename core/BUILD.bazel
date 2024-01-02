@@ -6,6 +6,7 @@ cc_binary(
     data = ["//static:corpus_data"],
     deps = [
         "//core/search",
+        "//core/unicode",
         "@boost//:locale",
     ],
 )
@@ -19,6 +20,7 @@ cc_library(
     ],
     deps = [
         "types",
+        "//core/unicode",
         "@nlohmann_json//:json",
     ],
 )
