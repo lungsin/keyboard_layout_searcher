@@ -80,20 +80,28 @@ void search(SearchState& state, FastReadCorpusStats const& corpus_stats,
   switch (state.getPhase()) {
     case SearchState::Phase::ADD_BUCKET: {
       // TODO: experiment with generator to do this loop
+      KeyId const first_unused_key = state.getFirstUnusedKey();
       for (size_t bucket_spec_id = 0;
            bucket_spec_id < state.bucket_specs_.size(); ++bucket_spec_id)
         if (!state.isBucketGroupFull(bucket_spec_id)) {
           state.addNewBucket(bucket_spec_id);
+          state.addKeyToCurrentBucket(first_unused_key);
           search(state, corpus_stats, threshold, search_stats, best_result,
                  metadata);
+          state.undoAddKeyToCurrentBucket();
           state.undoAddNewBucket();
         }
       break;
     }
     case SearchState::Phase::ADD_KEY: {
-      auto unused_keys = state.getUnusedKeys();
+      KeyId const latest_key = state.getCurrentBucket().back();
+      size_t const remaining_bucket_capacity =
+          state.getLatestBucketRemainingCapacity();
+      auto unused_keys = state.getUnusedKeysAfterPos(latest_key);
 
-      for (auto const& key : unused_keys) {
+      for (size_t i = 0; i + remaining_bucket_capacity <= unused_keys.size();
+           ++i) {
+        KeyId const& key = unused_keys[i];
         SearchStats new_stats = search_stats;
         for (auto const other_key : state.getCurrentBucket()) {
           new_stats.sfb += corpus_stats.getBigramFreq(other_key, key);
@@ -107,12 +115,14 @@ void search(SearchState& state, FastReadCorpusStats const& corpus_stats,
       break;
     }
     case SearchState::Phase::END: {
-      std::cout << "Found new layout. Num iterations: "
-                << metadata.num_iteration << std::endl;
       best_result.insert(search_stats.sfb, search_stats.sfs,
                          state.getAllBuckets());
       metadata.peak_best_results_size =
           std::max(metadata.peak_best_results_size, best_result.size());
+
+      std::cout << "Found new layout. Num iterations: "
+                << metadata.num_iteration
+                << ", Best results size: " << best_result.size() << std::endl;
       break;
     }
   }

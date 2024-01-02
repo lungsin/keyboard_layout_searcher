@@ -52,11 +52,13 @@ Bucket const& BucketContainer::getLatestBucket() const {
   return prealloc_buckets_[getLatestFlattenId()];
 }
 
-bool BucketContainer::empty() const { return bucket_spec_id_stack_.empty(); }
+size_t BucketContainer::getLatestBucketRemainingCapacity() const {
+  return bucket_specs_[bucket_spec_id_stack_.back()].capacity -
+         getLatestBucket().size();
+}
 
 bool BucketContainer::isLatestBucketFull() const {
-  return getLatestBucket().size() ==
-         bucket_specs_[bucket_spec_id_stack_.back()].capacity;
+  return getLatestBucketRemainingCapacity() == 0;
 }
 
 bool BucketContainer::isGroupFull(size_t const& group_id) const {
@@ -66,6 +68,8 @@ bool BucketContainer::isGroupFull(size_t const& group_id) const {
 bool BucketContainer::isFull() const {
   return bucket_spec_id_stack_.size() == prealloc_buckets_.size();
 }
+
+bool BucketContainer::empty() const { return bucket_spec_id_stack_.empty(); }
 
 static_vector<Bucket> BucketContainer::getAllBuckets() const {
   return prealloc_buckets_;
@@ -119,8 +123,12 @@ bool SearchState::isBucketGroupFull(BucketSpecId const& id) const {
   return bucket_container_.isGroupFull(id);
 }
 
-SearchState::KeysetIds SearchState::getUnusedKeys() const {
-  KeysetIds result;
+size_t SearchState::getLatestBucketRemainingCapacity() const {
+  return bucket_container_.getLatestBucketRemainingCapacity();
+}
+
+SearchState::KeyIds SearchState::getUnusedKeys() const {
+  KeyIds result;
   result.reserve(unused_keys_bitset_.count());
   for (size_t pos = unused_keys_bitset_.find_first();
        pos != boost::dynamic_bitset<>::npos;
@@ -128,4 +136,19 @@ SearchState::KeysetIds SearchState::getUnusedKeys() const {
     result.push_back(pos);
   }
   return result;
+}
+
+SearchState::KeyIds SearchState::getUnusedKeysAfterPos(
+    KeyId const& _pos) const {
+  KeyIds result;
+  for (size_t pos = unused_keys_bitset_.find_next(_pos);
+       pos != boost::dynamic_bitset<>::npos;
+       pos = unused_keys_bitset_.find_next(pos)) {
+    result.push_back(pos);
+  }
+  return result;
+}
+
+KeyId SearchState::getFirstUnusedKey() const {
+  return unused_keys_bitset_.find_first();
 }

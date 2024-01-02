@@ -9,8 +9,6 @@
 
 using namespace std;
 
-const string KEYSET = "abcdefghijklmnopqrstuvwxyz',.;";
-
 const std::filesystem::path kWorkingDirectoryPath =
     std::getenv("BUILD_WORKING_DIRECTORY");
 

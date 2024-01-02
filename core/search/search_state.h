@@ -32,13 +32,15 @@ class BucketContainer {
 
   const Bucket& getLatestBucket() const;
 
-  bool empty() const;
+  size_t getLatestBucketRemainingCapacity() const;
 
   bool isLatestBucketFull() const;
 
   bool isGroupFull(size_t const& group_id) const;
 
   bool isFull() const;
+
+  bool empty() const;
 
   static_vector<Bucket> getAllBuckets() const;
 
@@ -65,7 +67,7 @@ class SearchState {
     END,
   };
 
-  using KeysetIds = std::vector<KeyId>;
+  using KeyIds = std::vector<KeyId>;
 
   SearchState(const size_t& keyset_size,
               const std::vector<BucketSpec>& bucket_specs);
@@ -83,7 +85,13 @@ class SearchState {
 
   bool isBucketGroupFull(BucketSpecId const& id) const;
 
-  KeysetIds getUnusedKeys() const;
+  size_t getLatestBucketRemainingCapacity() const;
+
+  KeyIds getUnusedKeys() const;
+
+  KeyIds getUnusedKeysAfterPos(KeyId const& pos) const;
+
+  KeyId getFirstUnusedKey() const;
 
   // Helper
   Bucket const& getCurrentBucket() const;
