@@ -86,24 +86,31 @@ SearchState::SearchState(const size_t& keyset_size,
     : bucket_specs_(bucket_specs),
       keyset_size_(keyset_size),
       bucket_container_(bucket_specs),
-      unused_keys_bitset_(boost::dynamic_bitset<>(keyset_size).flip()) {}
+      unused_keys_bitset_(boost::dynamic_bitset<>(keyset_size).flip()),
+      recursion_depth_(0) {}
 
 void SearchState::addKeyToCurrentBucket(const size_t& key_id) {
   bucket_container_.getLatestBucket().push_back(key_id);
   unused_keys_bitset_.flip(key_id);
+  ++recursion_depth_;
 }
 
 void SearchState::undoAddKeyToCurrentBucket() {
   auto& current_bucket = bucket_container_.getLatestBucket();
   unused_keys_bitset_.flip(current_bucket.back());
   current_bucket.pop_back();
+  --recursion_depth_;
 }
 
 void SearchState::addNewBucket(const BucketSpecId& bucket_spec_id) {
   bucket_container_.appendBucket(bucket_spec_id);
+  ++recursion_depth_;
 }
 
-void SearchState::undoAddNewBucket() { bucket_container_.popBucket(); }
+void SearchState::undoAddNewBucket() {
+  bucket_container_.popBucket();
+  --recursion_depth_;
+}
 
 Bucket const& SearchState::getCurrentBucket() const {
   return bucket_container_.getLatestBucket();
@@ -112,6 +119,8 @@ Bucket const& SearchState::getCurrentBucket() const {
 static_vector<Bucket> SearchState::getAllBuckets() const {
   return bucket_container_.getAllBuckets();
 }
+
+size_t SearchState::getRecursionDepth() const { return recursion_depth_; }
 
 SearchState::Phase SearchState::getPhase() const {
   if (bucket_container_.empty()) return Phase::ADD_BUCKET;

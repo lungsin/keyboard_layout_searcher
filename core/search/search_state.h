@@ -98,6 +98,8 @@ class SearchState {
 
   static_vector<Bucket> getAllBuckets() const;
 
+  size_t getRecursionDepth() const;
+
   const std::vector<BucketSpec> bucket_specs_;
   const size_t keyset_size_;
 
@@ -105,4 +107,6 @@ class SearchState {
   BucketContainer bucket_container_;
 
   boost::dynamic_bitset<> unused_keys_bitset_;
+
+  size_t recursion_depth_;
 };

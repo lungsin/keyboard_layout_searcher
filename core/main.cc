@@ -58,11 +58,11 @@ int main(int, char**) {
   KeysetConfig keyset_config =
       loadKeysetConfig("static/keyset_config/default.json");
   std::vector<BucketSpec> bucket_specs = {{3, 6}, {6, 2}};
-  Threshold threshold(0.01, 0.065);
-  auto result =
-      search(keyset_config, bucket_specs, raw_corpus_stats, threshold);
+  Threshold threshold(0.008, 0.05);
+  auto result = search(keyset_config, bucket_specs, raw_corpus_stats, threshold,
+                       toWorkingDirectory("best_result.search.v2.txt"));
 
-  std::ofstream out_file(toWorkingDirectory("result.txt"));
+  std::ofstream out_file(toWorkingDirectory("result.v2.txt"));
 
   for (auto [sfb, sfs, layout] : result) {
     out_file << sfb << " " << sfs << " ";
