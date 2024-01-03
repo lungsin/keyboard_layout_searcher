@@ -17,4 +17,8 @@ TEST(BestPairSet, TestSimpleOperations) {
   EXPECT_THAT(bestInt.insert(2, 1, 3), IsEmpty());
   EXPECT_THAT(bestInt.getAllData(),
               ElementsAre(std::make_tuple(1, 2, 2), std::make_tuple(2, 1, 3)));
+
+  EXPECT_THAT(bestInt.insert(2, 2, 4), IsEmpty());
+  EXPECT_THAT(bestInt.getAllData(),
+              ElementsAre(std::make_tuple(1, 2, 2), std::make_tuple(2, 1, 3)));
 }

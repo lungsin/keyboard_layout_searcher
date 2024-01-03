@@ -42,7 +42,7 @@ class BestPairSet {
       return {};
     }
     // if exists a better metric in the store
-    if (lowerbound_it != store_.end() &&
+    if (lowerbound_it != store_.begin() &&
         std::prev(lowerbound_it)->first.betterThan(m)) {
       return {};
     }
@@ -50,7 +50,7 @@ class BestPairSet {
     // erase all that are worse
     auto worse_it = lowerbound_it;
     std::vector<Data> erased_data;
-    while (m.betterThan(worse_it->first)) {
+    while (worse_it != store_.end() && m.betterThan(worse_it->first)) {
       erased_data.insert(erased_data.end(), worse_it->second.begin(),
                          worse_it->second.end());
       ++worse_it;
