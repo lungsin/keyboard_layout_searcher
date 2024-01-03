@@ -5,6 +5,13 @@
 
 #include "core/keyset_config_transformator.h"
 
+constexpr size_t kMaxPrintProgressRecursionDepth = 3;
+
+std::string getIndentationPrefix(size_t const& level,
+                                 char const& prefix_char = ' ') {
+  return std::string(level * 2, prefix_char);
+}
+
 WideString bucketToWideString(Bucket const& bucket,
                               FastReadCorpusStats const& corpus_stats) {
   WideString bucket_str;
@@ -120,6 +127,8 @@ void printCheckpoint(SearchState const& state,
 
   std::ofstream best_result_f(best_result_filename);
   best_result_f << "[Best results]:" << std::endl;
+  best_result_f << "Keyset order: "
+                << unicode::toNarrow(corpus_stats.getKeyset()) << std::endl;
   auto raw_result = best_result.getAllData();
   for (auto [sfb, sfs, layout] : raw_result) {
     best_result_f << "SFB: " << calcSfb(sfb) << ", SFS: " << calcSfs(sfs)
@@ -158,29 +167,33 @@ void search(SearchState& state, FastReadCorpusStats const& corpus_stats,
     return;
   }
 
-  if (metadata.num_iteration % 100000000 == 0) {
-    std::cerr << "Num iteration: " << metadata.num_iteration << std::endl;
-    std::cerr << "[Search Stats   ] Sfb: " << search_stats.sfb
-              << ", SFS: " << search_stats.sfs << std::endl;
-    std::cerr << "[Threshold Stats] Sfb: " << threshold.sfb
-              << ", SFS: " << threshold.sfs << std::endl;
-  }
-
   // recursion
   switch (state.getPhase()) {
     case SearchState::Phase::ADD_BUCKET: {
       // TODO: experiment with generator to do this loop
       KeyId const first_unused_key = state.getFirstUnusedKey();
       for (size_t bucket_spec_id = 0;
-           bucket_spec_id < state.bucket_specs_.size(); ++bucket_spec_id)
-        if (!state.isBucketGroupFull(bucket_spec_id)) {
-          state.addNewBucket(bucket_spec_id);
-          state.addKeyToCurrentBucket(first_unused_key);
-          search(state, corpus_stats, threshold, search_stats, best_result,
-                 metadata, best_result_filename);
-          state.undoAddKeyToCurrentBucket();
-          state.undoAddNewBucket();
+           bucket_spec_id < state.bucket_specs_.size(); ++bucket_spec_id) {
+        if (state.isBucketGroupFull(bucket_spec_id)) continue;
+
+        // Print progress
+        if (state.getRecursionDepth() < kMaxPrintProgressRecursionDepth) {
+          std::cerr << getIndentationPrefix(state.getRecursionDepth())
+                    << "[ADD_BUCKET] size: "
+                    << state.bucket_specs_[bucket_spec_id].capacity
+                    << ", char: "
+                    << unicode::toNarrow(WideString(
+                           {corpus_stats.getCharFromId(first_unused_key)}))
+                    << std::endl;
         }
+
+        state.addNewBucket(bucket_spec_id);
+        state.addKeyToCurrentBucket(first_unused_key);
+        search(state, corpus_stats, threshold, search_stats, best_result,
+               metadata, best_result_filename);
+        state.undoAddKeyToCurrentBucket();
+        state.undoAddNewBucket();
+      }
       break;
     }
     case SearchState::Phase::ADD_KEY: {
@@ -192,6 +205,16 @@ void search(SearchState& state, FastReadCorpusStats const& corpus_stats,
       for (size_t i = 0; i + remaining_bucket_capacity <= unused_keys.size();
            ++i) {
         KeyId const& key = unused_keys[i];
+
+        // Print progress
+        if (state.getRecursionDepth() < kMaxPrintProgressRecursionDepth) {
+          std::cerr << getIndentationPrefix(state.getRecursionDepth())
+                    << "[ADD_KEY] key: "
+                    << unicode::toNarrow(
+                           WideString({corpus_stats.getCharFromId(key)}))
+                    << std::endl;
+        }
+
         SearchStats new_stats = search_stats;
         for (auto const other_key : state.getCurrentBucket()) {
           new_stats.sfb += corpus_stats.getBigramFreq(other_key, key) +

@@ -7,8 +7,8 @@
 #include "utils.h"
 
 RawCorpusStats::RawCorpusStats(std::istream& text_stream) {
-  for (std::string word; text_stream >> word;) {
-    addWord(unicode::toWide(word));
+  for (std::string line; std::getline(text_stream, line);) {
+    addLine(unicode::toWide(line));
   }
 }
 
@@ -69,7 +69,7 @@ RawCorpusStats RawCorpusStats::fromJsonFile(std::string const& json_path) {
   return fromJsonStream(json_stream);
 }
 
-void RawCorpusStats::addWord(const WideString& word) {
+void RawCorpusStats::addLine(const WideString& word) {
   const int n = word.size();
   for (const WideChar& c : word) {
     ++char_freqs_[c];
@@ -96,8 +96,8 @@ void RawCorpusStats::addWord(const WideString& word) {
   total_skipgrams3_ += std::max(n - 4, 0);
 }
 
-void RawCorpusStats::addWord(const std::string& word) {
-  addWord(unicode::toWide(word));
+void RawCorpusStats::addLine(const std::string& word) {
+  addLine(unicode::toWide(word));
 }
 
 void RawCorpusStats::save_as_json(std::ostream& out_stream) const {

@@ -14,7 +14,8 @@ struct ThresholdFreq {
 };
 
 struct SearchStats {
-  long long sfb, sfs;
+  long long sfb = 0;
+  long long sfs = 0;
 };
 
 struct SearchMetadata {

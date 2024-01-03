@@ -18,8 +18,8 @@ class RawCorpusStats {
   static RawCorpusStats fromJsonStream(std::istream& json_stream);
   static RawCorpusStats fromJsonFile(std::string const& json_path);
 
-  void addWord(const WideString& word);
-  void addWord(const std::string& word);
+  void addLine(const WideString& line);
+  void addLine(const std::string& line);
 
   void save_as_json(std::ostream& out_stream) const;
 

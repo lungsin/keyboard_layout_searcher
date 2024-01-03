@@ -7,7 +7,7 @@ TEST(RawCorpusStats, TestAddWord) {
   RawCorpusStats stats;
 
   WideString s = U"abcdefg";
-  stats.addWord(s);
+  stats.addLine(s);
 
   EXPECT_EQ(stats.getTotalChars(), 7);
   for (size_t i = 0; i < s.size(); ++i) {
