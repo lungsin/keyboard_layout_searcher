@@ -7,6 +7,7 @@ cc_binary(
     deps = [
         "//core/search",
         "//core/unicode",
+        "//third_party/cli11",
         "@boost//:locale",
     ],
 )

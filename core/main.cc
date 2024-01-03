@@ -6,6 +6,7 @@
 
 #include "core/search/search.h"
 #include "core/stats/raw_corpus_stats.h"
+#include "third_party/cli11/CLI11.hpp"
 
 using namespace std;
 
@@ -40,11 +41,18 @@ KeysetConfig loadKeysetConfig(std::filesystem::path const& config_path) {
   return j.template get<KeysetConfig>();
 }
 
-int main(int, char**) {
-  // Create system default locale
+void setupSystemDefaultLocale() {
   boost::locale::generator gen;
   locale loc = gen("");
   locale::global(loc);
+}
+
+int main(int argc, char** argv) {
+  CLI::App app;
+
+  CLI11_PARSE(app, argc, argv);
+
+  setupSystemDefaultLocale();
 
   std::filesystem::path raw_shai_path =
       toWorkingDirectory("static/stats/shai/shai.raw.json");
