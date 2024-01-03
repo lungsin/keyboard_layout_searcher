@@ -104,13 +104,9 @@ void SearchState::undoAddKeyToCurrentBucket() {
 
 void SearchState::addNewBucket(const BucketSpecId& bucket_spec_id) {
   bucket_container_.appendBucket(bucket_spec_id);
-  ++recursion_depth_;
 }
 
-void SearchState::undoAddNewBucket() {
-  bucket_container_.popBucket();
-  --recursion_depth_;
-}
+void SearchState::undoAddNewBucket() { bucket_container_.popBucket(); }
 
 Bucket const& SearchState::getCurrentBucket() const {
   return bucket_container_.getLatestBucket();
