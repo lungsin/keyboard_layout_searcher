@@ -200,12 +200,12 @@ void search(SearchState& state, FastReadCorpusStats const& corpus_stats,
       KeyId const latest_key = state.getCurrentBucket().back();
       size_t const remaining_bucket_capacity =
           state.getLatestBucketRemainingCapacity();
-      auto unused_keys = state.getUnusedKeysAfterPos(latest_key);
-
-      for (size_t i = 0; i + remaining_bucket_capacity <= unused_keys.size();
-           ++i) {
-        KeyId const& key = unused_keys[i];
-
+      auto const unused_keys = state.getUnusedKeysAfterPos(latest_key);
+      size_t const num_valid_unused_keys =
+          unused_keys.size() - remaining_bucket_capacity + 1;
+      for (KeyId const& key : unused_keys |
+                                  std::views::take(num_valid_unused_keys) |
+                                  std::views::reverse) {
         // Print progress
         if (state.getRecursionDepth() < kMaxPrintProgressRecursionDepth) {
           std::cerr << getIndentationPrefix(state.getRecursionDepth())
