@@ -1,0 +1,21 @@
+cc_binary(
+    name = "v2",
+    srcs = [
+        "v2.cc",
+    ],
+    data = ["//static:corpus_data"],
+    deps = [
+        "@nlohmann_json//:json",
+    ],
+)
+
+cc_binary(
+    name = "v3",
+    srcs = [
+        "v3.cc",
+    ],
+    data = ["//static:corpus_data"],
+    deps = [
+        "@nlohmann_json//:json",
+    ],
+)
