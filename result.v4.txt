@@ -1,0 +1,40 @@
+Bucket: iy. nhb eu; tdmjqz  cfpgwv ao' rl, skx 
+==== Stats static/oxeylyzer_stats/english.json
+SFB: 0.848 | SFS: 5.850
+Finger Usage:
+   10.102, 7.395, 
+   12.859, 11.162, 
+   14.673, 15.986, 
+   15.303, 12.166, 
+SFB per bucket Usage:
+   0.135, 0.130, 
+   0.042, 0.220, 
+   0.153, 0.094, 
+   0.056, 0.018, 
+
+==== Stats static/oxeylyzer_stats/450k.json
+SFB: 0.948 | SFS: 6.290
+Finger Usage:
+   10.887, 9.257, 
+   11.547, 12.346, 
+   14.514, 15.350, 
+   13.520, 12.574, 
+SFB per bucket Usage:
+   0.052, 0.144, 
+   0.142, 0.092, 
+   0.246, 0.127, 
+   0.094, 0.051, 
+
+==== Stats static/oxeylyzer_stats/indonesian.json
+SFB: 0.767 | SFS: 6.265
+Finger Usage:
+   10.458, 9.351, 
+   14.657, 9.126, 
+   12.615, 21.039, 
+   14.227, 8.170, 
+SFB per bucket Usage:
+   0.187, 0.219, 
+   0.049, 0.188, 
+   0.035, 0.049, 
+   0.035, 0.006, 
+
