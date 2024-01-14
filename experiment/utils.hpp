@@ -67,8 +67,9 @@ template <int MAX_SIZE>
 struct CompactStats {
   array<double, MAX_SIZE> characters;
   array<array<double, MAX_SIZE>, MAX_SIZE> bigrams, skipgrams;
+  array<array<array<double, MAX_SIZE>, MAX_SIZE>, MAX_SIZE> trigrams;
 
-  CompactStats() : characters({}), bigrams({}), skipgrams({}){};
+  CompactStats() : characters({}), bigrams({}), skipgrams({}), trigrams({}){};
   CompactStats(Stats const& stats) : CompactStats() {
     for (auto [s, p] : stats.characters) characters[s[0]] += p;
     for (auto [s, p] : stats.bigrams) {
@@ -78,6 +79,9 @@ struct CompactStats {
     for (auto [s, p] : stats.skipgrams) {
       skipgrams[s[0]][s[1]] += p;
       skipgrams[s[1]][s[0]] += p;
+    }
+    for (auto [s, p] : stats.trigrams) {
+      trigrams[s[0]][s[1]][s[2]] += p;
     }
   }
 };
