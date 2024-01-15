@@ -16,6 +16,7 @@ constexpr int NUM_BUCKET = 4;
 // alternating left-right from pinky to index finger
 constexpr int BUCKET_CAP[NUM_BUCKET] = {3, 3, 3, 6};
 constexpr int NUM_HANDS = 2;
+constexpr int NUM_FINGERS = NUM_BUCKET * NUM_HANDS;
 
 const int NUM_STATS = 3;
 const string STATS_FNAME[NUM_STATS] = {
@@ -40,8 +41,8 @@ constexpr ThresholdPerLang THRESHOLD_SFS_PER_LANG = {0.065, 0.075, 0.085};
 constexpr bool ENABLE_FINGER_THRESHOLD = true;
 constexpr ThresholdFingerUsage THRESHOLD_FINGER_USAGE = {
     {{0.12, 0.14, 0.30, 0.30},
-     {0.15, 0.15, 0.30, 0.30},
-     {0.15, 0.20, 0.30, 0.30}}};
+     {0.14, 0.15, 0.30, 0.30},
+     {0.14, 0.15, 0.30, 0.30}}};
 
 constexpr bool ENABLE_SFB_PER_FINGER_THRESHOLD = true;
 constexpr ThresholdFingerUsage THRESHOLD_SFB_PER_FINGER = {
@@ -53,9 +54,14 @@ constexpr ThresholdPerLang THRESHOLD_REDIRECTS_PER_LANG = {0.06, 0.08, 0.11};
 
 constexpr double WEIGHT_SFB = 1;
 constexpr double WEIGHT_SFS = 1;
-constexpr double WEIGHT_FINGER_USAGE_OVERALL = 0.01;
-constexpr double WEIGHT_SFB_PER_FINGER_OVERALL = 1;
 constexpr array<double, NUM_BUCKET> WEIGHT_FINGER_USAGE = {8, 4, 2, 1};
+constexpr double WEIGHT_FINGER_USAGE_NORMALIZE =
+    1.0 /
+    accumulate(WEIGHT_FINGER_USAGE.begin(), WEIGHT_FINGER_USAGE.end(), 0.0);
+constexpr double WEIGHT_FINGER_USAGE_OVERALL =
+    0.01 * WEIGHT_FINGER_USAGE_NORMALIZE;
+
+constexpr double WEIGHT_SFB_PER_FINGER_OVERALL = 1;
 constexpr array<double, NUM_BUCKET> WEIGHT_SFB_PER_FINGER = {8, 4, 2, 1};
 
 constexpr double WEIGHT_ALTERNATES = 0.01;
@@ -99,6 +105,9 @@ inline pair<int, int> toBucketIdBucketCntId(FlatBucketId const bucket_flat_id) {
   return {bucket_flat_id >> 1, bucket_flat_id & 1};
 }
 
+using TrigramBucketStats =
+    array<array<array<double, NUM_FINGERS>, NUM_FINGERS>, NUM_FINGERS>;
+
 struct LayoutStats {
   double sfb = 0, sfs = 0;
 
@@ -114,6 +123,8 @@ struct LayoutStats {
   double score = 0;
 
   FastStats corpus_stats;
+
+  TrigramBucketStats trigram_bucket_stats;
 
   LayoutStats() = default;
   LayoutStats(FastStats const& corpus_stats) : corpus_stats(corpus_stats) {}
@@ -140,6 +151,35 @@ struct LayoutStats {
     }
   }
 
+  inline void precomputeTrigramBucketStats(Buckets const& buckets) {
+    for (int bucket_flat_id_1 = 0; bucket_flat_id_1 < NUM_FINGERS;
+         ++bucket_flat_id_1) {
+      for (int bucket_flat_id_2 = 0; bucket_flat_id_2 < NUM_FINGERS;
+           ++bucket_flat_id_2) {
+        for (int bucket_flat_id_3 = 0; bucket_flat_id_3 < NUM_FINGERS;
+             ++bucket_flat_id_3) {
+          double& stats =
+              trigram_bucket_stats[bucket_flat_id_1][bucket_flat_id_2]
+                                  [bucket_flat_id_3];
+          auto const [bucket_id_1, bucket_cnt_id_1] =
+              toBucketIdBucketCntId(bucket_flat_id_1);
+          auto const [bucket_id_2, bucket_cnt_id_2] =
+              toBucketIdBucketCntId(bucket_flat_id_2);
+          auto const [bucket_id_3, bucket_cnt_id_3] =
+              toBucketIdBucketCntId(bucket_flat_id_3);
+
+          // calculate trigram sum for bucket combination
+          stats = 0;
+
+          for (char const key_1 : buckets[bucket_id_1][bucket_cnt_id_1])
+            for (char const key_2 : buckets[bucket_id_2][bucket_cnt_id_2])
+              for (char const key_3 : buckets[bucket_id_3][bucket_cnt_id_3])
+                stats += corpus_stats.trigrams[key_1][key_2][key_3];
+        }
+      }
+    }
+  }
+
   inline void updateTrigramStats(FlatBucketId const bucket_flat_id_1,
                                  FlatBucketId const bucket_flat_id_2,
                                  FlatBucketId const bucket_flat_id_3,
@@ -157,15 +197,10 @@ struct LayoutStats {
     int const hand_id_2 = bucket_to_hand[bucket_id_2][bucket_cnt_id_2];
     int const hand_id_3 = bucket_to_hand[bucket_id_3][bucket_cnt_id_3];
 
-    double const delta_trigrams = [&]() {
-      double delta_trigrams = 0;
-      for (char const key_1 : buckets[bucket_id_1][bucket_cnt_id_1])
-        for (char const key_2 : buckets[bucket_id_2][bucket_cnt_id_2])
-          for (char const key_3 : buckets[bucket_id_3][bucket_cnt_id_3])
-            delta_trigrams += corpus_stats.trigrams[key_1][key_2][key_3];
-
-      return delta_trigrams * modifier;
-    }();
+    double const delta_trigrams =
+        trigram_bucket_stats[bucket_flat_id_1][bucket_flat_id_2]
+                            [bucket_flat_id_3] *
+        modifier;
 
     // alternates
     if (hand_id_1 != hand_id_2 && hand_id_1 == hand_id_3) {
@@ -270,6 +305,12 @@ struct PartialLayout {
                                bucket_cnt_id, hand_id, modifier);
   }
 
+  inline void precomputeTrigramBucketStats() {
+    aggregated_stats.precomputeTrigramBucketStats(buckets);
+    for (auto& stats : stats_per_language)
+      stats.precomputeTrigramBucketStats(buckets);
+  }
+
   inline void assignBucketToHand(int const bucket_id, int const bucket_cnt_id,
                                  int const hand_id) {
     bucket_to_hand[bucket_id].push_back(hand_id);
@@ -345,6 +386,7 @@ void shuffle(int bucket_id) {
 inline void done() {
   assert(best_partial_layout.aggregated_stats.score >=
          partial_layout.aggregated_stats.score);
+  partial_layout.precomputeTrigramBucketStats();
   shuffle(0);
   ++num_done;
 }
