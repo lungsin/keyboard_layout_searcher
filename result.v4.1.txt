@@ -1,4 +1,5 @@
-Bucket: svz nrx tdm cfpgwb  hl.,kj ao' iuy eq; 
+Bucket: 
+svz nrx tdm cfpgwb  hl.,kj ao' iuy eq; 
 ==== Stats static/oxeylyzer_stats/english.json
 SFB: 0.801 | SFS: 6.196
 Finger Usage:
@@ -46,4 +47,3 @@ SFB per bucket Usage:
 Total alternates: 44.096
 Total rolls: 40.044
 Total redirect: 9.949
-
