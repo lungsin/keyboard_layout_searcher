@@ -30,13 +30,29 @@ const double STATS_WEIGHT[NUM_STATS] = {
     4,
 };
 
+const string RECURVA_PATH = "static/kb/recurva.kb";
+
+constexpr int NUM_ROWS = 3;
+constexpr int TOP_ROW = 0;
+constexpr int MIDDLE_ROW = 1;
+constexpr int BOTTOM_ROW = 2;
+
+// Thresholds and weights config
+constexpr double PERCENT = 0.01;
 using ThresholdPerLang = array<double, NUM_STATS>;
 using ThresholdFingerUsage = array<array<double, NUM_BUCKET>, NUM_STATS>;
 
-constexpr double AGGREGATED_THRESHOLD_SFB = 0.020;
+constexpr double AGGREGATED_THRESHOLD_SFB = 1 * PERCENT;
 constexpr ThresholdPerLang THRESHOLD_SFB_PER_LANG = {0.0090, 0.0095, 0.0100};
-constexpr double AGGREGATED_THRESHOLD_SFS = 0.085;
+constexpr double AGGREGATED_THRESHOLD_SFS = 8.5 * PERCENT;
 constexpr ThresholdPerLang THRESHOLD_SFS_PER_LANG = {0.065, 0.075, 0.085};
+
+constexpr double AGGREGATED_THRESHOLD_SFB_2U = 0.2 * PERCENT;
+constexpr ThresholdPerLang THRESHOLD_SFB_2U_PER_LANG = {
+    0.2 * PERCENT, 0.2 * PERCENT, 0.2 * PERCENT};
+constexpr double AGGREGATED_THRESHOLD_SFS_2U = 1 * PERCENT;
+constexpr ThresholdPerLang THRESHOLD_SFS_2U_PER_LANG = {
+    0.5 * PERCENT, 0.5 * PERCENT, 1.5 * PERCENT};
 
 constexpr bool ENABLE_FINGER_THRESHOLD = true;
 constexpr ThresholdFingerUsage THRESHOLD_FINGER_USAGE = {{
@@ -52,12 +68,14 @@ constexpr ThresholdFingerUsage THRESHOLD_SFB_PER_FINGER = {{
     {0.1, 0.1, 0.1, 0.1},
 }};
 
-constexpr ThresholdPerLang THRESHOLD_ALTERNATES_PER_LANG = {0.35, 0.35, 0.35};
-constexpr ThresholdPerLang THRESHOLD_ROLLS_PER_LANG = {0.35, 0.35, 0.35};
-constexpr ThresholdPerLang THRESHOLD_REDIRECTS_PER_LANG = {0.06, 0.08, 0.11};
+constexpr ThresholdPerLang THRESHOLD_ALTERNATES_PER_LANG = {0.30, 0.30, 0.30};
+constexpr ThresholdPerLang THRESHOLD_ROLLS_PER_LANG = {0.30, 0.30, 0.30};
+constexpr ThresholdPerLang THRESHOLD_REDIRECTS_PER_LANG = {0.08, 0.15, 0.15};
 
 constexpr double WEIGHT_SFB = 1;
 constexpr double WEIGHT_SFS = 1;
+constexpr double WEIGHT_SFB_2U = 1;
+constexpr double WEIGHT_SFS_2U = 1;
 
 constexpr double WEIGHT_FINGER_USAGE_OVERALL = 0.01 * 0;
 constexpr array<double, NUM_BUCKET> WEIGHT_FINGER_USAGE = {4, 3, 2, 1};
@@ -65,16 +83,45 @@ constexpr array<double, NUM_BUCKET> WEIGHT_FINGER_USAGE = {4, 3, 2, 1};
 constexpr double WEIGHT_SFB_PER_FINGER_OVERALL = 1 * 0;
 constexpr array<double, NUM_BUCKET> WEIGHT_SFB_PER_FINGER = {4, 3, 2, 1};
 
-constexpr double WEIGHT_ALTERNATES = 0.001 * 0;
-constexpr double WEIGHT_ROLLS = 0.001 * 0;
-constexpr double WEIGHT_REDIRECT = 0.001 * 0;
+constexpr double WEIGHT_ALTERNATES = 0;
+constexpr double WEIGHT_ROLLS = 0;
+constexpr double WEIGHT_REDIRECT = 0;
 
+using Bucket = vector<char>;
 // [bucket_id][bucket_cnt_id] => string
-using Buckets = array<vector<vector<char>>, NUM_BUCKET>;
+using Buckets = array<vector<Bucket>, NUM_BUCKET>;
 using BucketToHand = array<vector<int>, NUM_BUCKET>;
+using RowToBucketKeyId = array<vector<int>, NUM_ROWS>;
+using BucketRowAssignment =
+    array<array<RowToBucketKeyId, NUM_HANDS>, NUM_BUCKET>;
 using FlatBucketId = int;
 
 using FastStats = CompactStats<MAX_ASCII>;
+
+Buckets readKb(filesystem::path path) {
+  Buckets result = {{{{}, {}}, {{}, {}}, {{}, {}}, {{}, {}}}};
+  ifstream in(path);
+  for (int r = 0; r < NUM_ROWS; r++) {
+    for (int i = 0; i < NUM_BUCKET; i++) {
+      int offset = BUCKET_CAP[i] / NUM_ROWS;
+      for (int j = 0; j < offset; j++) {
+        char key;
+        in >> key;
+        result[i][0].push_back(key);
+      }
+    }
+
+    for (int i = NUM_BUCKET - 1; i >= 0; i--) {
+      int offset = BUCKET_CAP[i] / NUM_ROWS;
+      for (int j = 0; j < offset; j++) {
+        char key;
+        in >> key;
+        result[i][1].push_back(key);
+      }
+    }
+  }
+  return result;
+}
 
 pair<FastStats, array<FastStats, NUM_STATS>> readAllStats() {
   cerr << "Reading all stats" << endl;
@@ -118,6 +165,8 @@ struct LayoutStats {
 
   array<array<double, NUM_HANDS>, NUM_BUCKET> sfb_bucket = {{}},
                                               finger_usage = {{}};
+
+  double sfb_2u = 0, sfs_2u = 0;
 
   // trigram stats
   double alternates = 0, inverse_alternates = 0;
@@ -265,6 +314,27 @@ struct LayoutStats {
       }
     }
   }
+
+  inline void updateStatsBucketRowAssignment(
+      Bucket const& bucket, RowToBucketKeyId const& row_to_bucket_key_id,
+      int const modifier) {
+    for (auto const top_key_id : row_to_bucket_key_id[TOP_ROW]) {
+      char const top_key = bucket[top_key_id];
+      for (auto const bottom_key_id : row_to_bucket_key_id[BOTTOM_ROW]) {
+        char const bottom_key = bucket[bottom_key_id];
+        double const delta_sfb_2u =
+            corpus_stats.bigrams[top_key][bottom_key] * modifier;
+        double const delta_sfs_2u =
+            corpus_stats.skipgrams[top_key][bottom_key] * modifier;
+
+        sfb_2u += delta_sfb_2u;
+        sfs_2u += delta_sfs_2u;
+
+        score += delta_sfb_2u * WEIGHT_SFB_2U;
+        score += delta_sfs_2u * WEIGHT_SFS_2U;
+      }
+    }
+  }
 };
 
 struct PartialLayout {
@@ -274,6 +344,47 @@ struct PartialLayout {
   array<LayoutStats, NUM_STATS> stats_per_language;
 
   BucketToHand bucket_to_hand = {};
+
+  BucketRowAssignment bucket_row_assignment = {};
+
+  PartialLayout() = default;
+
+  inline void setStats(FastStats const& aggregated_stats,
+                       array<FastStats, NUM_STATS> const& stats_list) {
+    this->aggregated_stats = aggregated_stats;
+    for (int i = 0; i < NUM_STATS; i++) {
+      this->stats_per_language[i] = stats_list[i];
+    }
+  }
+
+  inline void setLayout(Buckets const& layout) {
+    for (int bucket_id = 0; bucket_id < NUM_BUCKET; ++bucket_id) {
+      for (int bucket_cnt_id = 0; bucket_cnt_id < NUM_HANDS; ++bucket_cnt_id) {
+        auto const& bucket = layout[bucket_id][bucket_cnt_id];
+        pushBucket(bucket_id, *bucket.begin());
+        for (int i = 1; i < bucket.size(); ++i) {
+          pushKey(bucket_id, bucket_cnt_id, bucket[i]);
+        }
+      }
+    }
+
+    for (int bucket_id = 0; bucket_id < NUM_BUCKET; ++bucket_id) {
+      for (int bucket_cnt_id = 0; bucket_cnt_id < NUM_HANDS; ++bucket_cnt_id) {
+        assignBucketToHand(bucket_id, bucket_cnt_id, bucket_cnt_id);
+      }
+    }
+
+    for (int bucket_id = 0; bucket_id < NUM_BUCKET; ++bucket_id) {
+      for (int bucket_cnt_id = 0; bucket_cnt_id < NUM_HANDS; ++bucket_cnt_id) {
+        auto const& bucket = layout[bucket_id][bucket_cnt_id];
+        RowToBucketKeyId row_to_bucket_id;
+        for (int i = 0; i < bucket.size(); i++) {
+          row_to_bucket_id[i / (bucket.size() / NUM_ROWS)].push_back(i);
+        }
+        setBucketRowPermut(bucket_id, bucket_cnt_id, row_to_bucket_id);
+      }
+    }
+  }
 
   inline void updateStats(int const bucket_id, int const bucket_cnt_id,
                           char const key, int const modifier) {
@@ -329,18 +440,51 @@ struct PartialLayout {
     updateStatsShuffle(bucket_id, bucket_cnt_id, hand_id, -1);
     bucket_to_hand[bucket_id].pop_back();
   }
+
+  inline void updateStatsBucketRowPermut(int const bucket_id,
+                                         int const bucket_cnt_id,
+                                         int const modifier) {
+    aggregated_stats.updateStatsBucketRowAssignment(
+        buckets[bucket_id][bucket_cnt_id],
+        bucket_row_assignment[bucket_id][bucket_cnt_id], modifier);
+    for (auto& stats : stats_per_language)
+      stats.updateStatsBucketRowAssignment(
+          buckets[bucket_id][bucket_cnt_id],
+          bucket_row_assignment[bucket_id][bucket_cnt_id], modifier);
+  }
+
+  inline void setBucketRowPermut(int const bucket_id, int const bucket_cnt_id,
+                                 RowToBucketKeyId const& row_to_bucket_id) {
+    bucket_row_assignment[bucket_id][bucket_cnt_id] = row_to_bucket_id;
+    updateStatsBucketRowPermut(bucket_id, bucket_cnt_id, 1);
+  }
+
+  inline void unsetBucketRowPermut(int const bucket_id, int const bucket_cnt_id,
+                                   RowToBucketKeyId const& row_to_bucket_id) {
+    updateStatsBucketRowPermut(bucket_id, bucket_cnt_id, -1);
+  }
 };
 
 PartialLayout partial_layout, best_partial_layout;
 
 // Bruteforce metadata
 int recursion_depth = 0;
-long long num_iterations = 0, num_done = 0, num_shuffle_done = 0;
+long long num_iterations = 0;
+long long num_done = 0, num_bucket_row_assignment_done = 0,
+          num_shuffle_done = 0;
+
+inline void doneShuffle();
+void shuffleBucketToHand(int bucket_id);
+inline void doneBruteBucketRowAssignment();
+void bruteRowKeysInBucket(int const bucket_id, int const bucket_cnt_id);
 
 inline void doneShuffle() {
   assert(best_partial_layout.aggregated_stats.score >=
          partial_layout.aggregated_stats.score);
-  best_partial_layout = partial_layout;
+
+  // DONE ORDERING
+  bruteRowKeysInBucket(0, 0);
+  // best_partial_layout = partial_layout;
   ++num_shuffle_done;
 }
 
@@ -390,10 +534,130 @@ void shuffleBucketToHand(int bucket_id) {
   }
 }
 
+inline bool isBruteBucketRowAssignmentPruneable() {
+  ++num_iterations;
+  LayoutStats const& aggregated_layout_stats = partial_layout.aggregated_stats;
+
+  if (aggregated_layout_stats.score >
+      best_partial_layout.aggregated_stats.score)
+    return true;
+
+  if (aggregated_layout_stats.sfb_2u > AGGREGATED_THRESHOLD_SFB_2U ||
+      aggregated_layout_stats.sfs_2u > AGGREGATED_THRESHOLD_SFS_2U)
+    return true;
+
+  for (int i = 0; i < NUM_STATS; ++i) {
+    auto const& stats = partial_layout.stats_per_language[i];
+    if (stats.sfb_2u > THRESHOLD_SFB_2U_PER_LANG[i] ||
+        stats.sfs_2u > THRESHOLD_SFS_2U_PER_LANG[i])
+      return true;
+  }
+
+  return false;
+}
+
+inline void doneBruteBucketRowAssignment() {
+  assert(best_partial_layout.aggregated_stats.score >=
+         partial_layout.aggregated_stats.score);
+  // DONE ORDERING
+  best_partial_layout = partial_layout;
+  // shuffleBucketToHand(0);
+  ++num_bucket_row_assignment_done;
+}
+
+inline void setBucketRowPermut(int const bucket_id, int const bucket_cnt_id,
+                               RowToBucketKeyId const& row_to_bucket_id) {
+  partial_layout.setBucketRowPermut(bucket_id, bucket_cnt_id, row_to_bucket_id);
+}
+
+inline void unsetBucketRowPermut(int const bucket_id, int const bucket_cnt_id,
+                                 RowToBucketKeyId const& row_to_bucket_id) {
+  partial_layout.unsetBucketRowPermut(bucket_id, bucket_cnt_id,
+                                      row_to_bucket_id);
+}
+
+template <int num_keys, int num_results>
+constexpr array<array<int, num_keys>, num_results> getRowPermutationFor2U() {
+  array<int, num_keys> permut;
+  for (int i = 0; i < num_keys; i++) {
+    permut[i] = i / (num_keys / NUM_ROWS);
+  }
+
+  auto isOk = [](array<int, num_keys> const& permut) {
+    for (int elem : permut) {
+      if (elem == MIDDLE_ROW)
+        continue;
+      else if (elem == TOP_ROW)
+        return true;
+      else if (elem == BOTTOM_ROW)
+        return false;
+    }
+    assert(false);
+  };
+
+  array<array<int, num_keys>, num_results> results;
+  int i = 0;
+  do {
+    if (isOk(permut)) {
+      assert(i < num_results);
+      results[i++] = permut;
+    }
+  } while (next_permutation(permut.begin(), permut.end()));
+  return results;
+}
+
+const array<array<int, 3>, 3> ROW_PERMUT_FOR_2U_3_KEYS =
+    getRowPermutationFor2U<3, 3>();
+const array<array<int, 6>, 45> ROW_PERMUT_FOR_2U_6_KEYS =
+    getRowPermutationFor2U<6, 45>();
+
+void bruteRowKeysInBucket(int const bucket_id, int const bucket_cnt_id) {
+  if (isBruteBucketRowAssignmentPruneable()) {
+    return;
+  }
+
+  if (bucket_id == NUM_BUCKET) {
+    doneBruteBucketRowAssignment();
+    return;
+  }
+
+  if (bucket_cnt_id == NUM_HANDS) {
+    bruteRowKeysInBucket(bucket_id + 1, 0);
+    return;
+  }
+
+  auto bruteNext = [&](vector<int> const& permut) {
+    RowToBucketKeyId row_to_bucket_key_id;
+    for (int bucket_key_id = 0; bucket_key_id < permut.size();
+         ++bucket_key_id) {
+      row_to_bucket_key_id[permut[bucket_key_id]].push_back(bucket_key_id);
+    }
+    setBucketRowPermut(bucket_id, bucket_cnt_id, row_to_bucket_key_id);
+    bruteRowKeysInBucket(bucket_id, bucket_cnt_id + 1);
+    unsetBucketRowPermut(bucket_id, bucket_cnt_id, row_to_bucket_key_id);
+  };
+
+  auto const& buckets = partial_layout.buckets[bucket_id][bucket_cnt_id];
+  if (buckets.size() == 3) {
+    for (auto const& permut : ROW_PERMUT_FOR_2U_3_KEYS) {
+      bruteNext(vector<int>(permut.begin(), permut.end()));
+    }
+  } else if (buckets.size() == 6) {
+    for (auto const& permut : ROW_PERMUT_FOR_2U_6_KEYS) {
+      bruteNext(vector<int>(permut.begin(), permut.end()));
+    }
+  } else {
+    // Not supported
+    assert(false);
+  }
+}
+
 inline void done() {
   assert(best_partial_layout.aggregated_stats.score >=
          partial_layout.aggregated_stats.score);
+  // DONE ORDERING
   partial_layout.precomputeTrigramBucketStats();
+  // bruteRowKeysInBucket(0, 0);
   shuffleBucketToHand(0);
   ++num_done;
 }
@@ -506,29 +770,60 @@ void brute(int key_id) {
   }
 }
 
-void printBuckets(Buckets const& buckets, BucketToHand const& bucket_to_hand) {
+void printBuckets(Buckets const& buckets, BucketToHand const& bucket_to_hand,
+                  BucketRowAssignment const& bucket_row_assignment) {
+  printf("==========================\n");
   printf("Bucket:\n");
 
   Buckets layout = buckets;
+  // row, hand, bucket
+  for (int i = 0; i < NUM_BUCKET; ++i) {
+    for (int j = 0; j < NUM_HANDS; ++j) {
+      auto const& row_to_bucket_key_id = bucket_row_assignment[i][j];
+      Bucket const& bucket = buckets[i][j];
+      Bucket result;
+      for (int row_id = 0; row_id < NUM_ROWS; ++row_id) {
+        for (auto const bucket_key_id : row_to_bucket_key_id[row_id])
+          result.push_back(bucket[bucket_key_id]);
+      }
+      layout[i][j] = result;
+      assert(result.size() == buckets[i][j].size());
+      assert(result.size() == BUCKET_CAP[i]);
+    }
+  }
+
   for (int i = 0; i < NUM_BUCKET; i++) {
     assert(layout[i].size() == NUM_HANDS &&
            bucket_to_hand[i].size() == NUM_HANDS);
     if (bucket_to_hand[i][0]) swap(layout[i][0], layout[i][1]);
   }
 
-  for (int i = 0; i < NUM_BUCKET; ++i) {
-    printf("%s ", string(layout[i][0].begin(), layout[i][0].end()).c_str());
+  for (int r = 0; r < NUM_ROWS; r++) {
+    for (int i = 0; i < NUM_BUCKET; ++i) {
+      int const offset = layout[i][0].size() / NUM_ROWS;
+      for (int j = 0; j < offset; j++) {
+        printf("%c ", layout[i][0][r * offset + j]);
+      }
+    }
+    printf(" ");
+    for (int i = NUM_BUCKET - 1; i >= 0; --i) {
+      int const offset = layout[i][1].size() / NUM_ROWS;
+      for (int j = 0; j < offset; j++) {
+        printf("%c ", layout[i][1][r * offset + j]);
+      }
+    }
+    printf("\n");
   }
-  printf(" ");
-  for (int i = NUM_BUCKET - 1; i >= 0; --i) {
-    printf("%s ", string(layout[i][1].begin(), layout[i][1].end()).c_str());
-  }
+
   printf("\n");
 }
 
 void printBucketStats(LayoutStats const& layout_stats) {
   printf("SFB: %2.3lf | SFS: %2.3lf\n", layout_stats.sfb * 100,
          layout_stats.sfs * 100);
+
+  printf("SFB (2U): %2.3lf | SFS (2U): %2.3lf\n", layout_stats.sfb_2u * 100,
+         layout_stats.sfs_2u * 100);
 
   printf("Finger Usage:\n");
   for (int i = 0; i < NUM_BUCKET; ++i) {
@@ -556,21 +851,33 @@ void printBucketStats(LayoutStats const& layout_stats) {
 int main() {
   auto [aggregated_stats, stats_list] = readAllStats();
 
-  partial_layout.aggregated_stats = aggregated_stats;
-  best_partial_layout.aggregated_stats.score = 1e18;
+  partial_layout.setStats(aggregated_stats, stats_list);
+  best_partial_layout.setStats(aggregated_stats, stats_list);
+
+  best_partial_layout.setLayout(readKb(RECURVA_PATH));
+  cout << "Baseline layout stats from " << RECURVA_PATH << endl;
+  printBuckets(best_partial_layout.buckets, best_partial_layout.bucket_to_hand,
+               best_partial_layout.bucket_row_assignment);
+  cout << "Score: " << best_partial_layout.aggregated_stats.score << endl;
   for (int i = 0; i < NUM_STATS; i++) {
-    partial_layout.stats_per_language[i] = stats_list[i];
+    cout << "==== Stats " << STATS_FNAME[i] << endl;
+    printBucketStats(best_partial_layout.stats_per_language[i]);
+    cout << endl;
   }
+  cout << endl;
 
   brute(0);
 
   cerr << "==== Metadata ====\nNum Iterations: " << num_iterations << endl;
   cerr << "Num done: " << num_done << endl;
+  cerr << "Num row assign done: " << num_bucket_row_assignment_done << endl;
   cerr << "Num shuffle done: " << num_shuffle_done << endl;
+  cerr << "Best score: " << best_partial_layout.aggregated_stats.score << endl;
 
   if (num_shuffle_done == 0) return 0;
 
-  printBuckets(best_partial_layout.buckets, best_partial_layout.bucket_to_hand);
+  printBuckets(best_partial_layout.buckets, best_partial_layout.bucket_to_hand,
+               best_partial_layout.bucket_row_assignment);
   for (int i = 0; i < NUM_STATS; i++) {
     cout << "==== Stats " << STATS_FNAME[i] << endl;
     printBucketStats(best_partial_layout.stats_per_language[i]);

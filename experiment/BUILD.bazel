@@ -41,3 +41,15 @@ cc_binary(
         "@nlohmann_json//:json",
     ],
 )
+
+cc_binary(
+    name = "v5",
+    srcs = [
+        "v5.cc",
+    ],
+    data = ["//static:corpus_data"],
+    deps = [
+        "utils",
+        "@nlohmann_json//:json",
+    ],
+)
