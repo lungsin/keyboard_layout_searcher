@@ -105,6 +105,10 @@ inline pair<int, int> toBucketIdBucketCntId(FlatBucketId const bucket_flat_id) {
   return {bucket_flat_id >> 1, bucket_flat_id & 1};
 }
 
+// Sum of trigrams stats for keys in buckets, i.e.
+// value[bucket_1][bucket_2][bucket_3] =
+//    sum {key_1: bucket_1, key_2: bucket_2, key_3: bucket_3}
+//      trigram[key_1][key_2][key_3]
 using TrigramBucketStats =
     array<array<array<double, NUM_FINGERS>, NUM_FINGERS>, NUM_FINGERS>;
 
