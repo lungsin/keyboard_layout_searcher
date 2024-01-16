@@ -1,0 +1,50 @@
+Bucket:
+sfz tdk nrx cpgwbv  hlm.,j ao' iuy eq; 
+==== Stats static/oxeylyzer_stats/english.json
+SFB: 0.792 | SFS: 5.939
+Finger Usage:
+   11.909, 8.599, 
+   13.321, 11.862, 
+   15.986, 12.988, 
+   13.452, 11.530, 
+SFB per bucket Usage:
+   0.044, 0.021, 
+   0.011, 0.174, 
+   0.094, 0.146, 
+   0.279, 0.022, 
+Total alternates: 35.636
+Total rolls: 47.930
+Total redirect: 5.755
+
+==== Stats static/oxeylyzer_stats/450k.json
+SFB: 0.910 | SFS: 6.252
+Finger Usage:
+   11.082, 9.717, 
+   10.569, 14.485, 
+   15.350, 14.367, 
+   11.155, 13.270, 
+SFB per bucket Usage:
+   0.028, 0.031, 
+   0.026, 0.263, 
+   0.127, 0.199, 
+   0.153, 0.082, 
+Total alternates: 39.896
+Total rolls: 43.833
+Total redirect: 6.743
+
+==== Stats static/oxeylyzer_stats/indonesian.json
+SFB: 0.923 | SFS: 8.165
+Finger Usage:
+   7.774, 4.872, 
+   13.745, 14.240, 
+   21.039, 14.716, 
+   12.817, 10.440, 
+SFB per bucket Usage:
+   0.001, 0.007, 
+   0.202, 0.178, 
+   0.049, 0.144, 
+   0.333, 0.008, 
+Total alternates: 46.344
+Total rolls: 37.719
+Total redirect: 9.925
+

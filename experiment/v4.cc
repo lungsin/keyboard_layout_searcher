@@ -39,34 +39,35 @@ constexpr double AGGREGATED_THRESHOLD_SFS = 0.085;
 constexpr ThresholdPerLang THRESHOLD_SFS_PER_LANG = {0.065, 0.075, 0.085};
 
 constexpr bool ENABLE_FINGER_THRESHOLD = true;
-constexpr ThresholdFingerUsage THRESHOLD_FINGER_USAGE = {
-    {{0.12, 0.14, 0.30, 0.30},
-     {0.14, 0.15, 0.30, 0.30},
-     {0.14, 0.15, 0.30, 0.30}}};
+constexpr ThresholdFingerUsage THRESHOLD_FINGER_USAGE = {{
+    {0.12, 0.14, 0.25, 0.30},
+    {0.14, 0.15, 0.25, 0.30},
+    {0.14, 0.15, 0.25, 0.30},
+}};
 
 constexpr bool ENABLE_SFB_PER_FINGER_THRESHOLD = true;
-constexpr ThresholdFingerUsage THRESHOLD_SFB_PER_FINGER = {
-    {{0.001, 0.02, 0.10, 0.10}, {0.1, 0.1, 0.1, 0.1}, {0.1, 0.1, 0.1, 0.1}}};
+constexpr ThresholdFingerUsage THRESHOLD_SFB_PER_FINGER = {{
+    {0.001, 0.02, 0.10, 0.10},
+    {0.1, 0.1, 0.1, 0.1},
+    {0.1, 0.1, 0.1, 0.1},
+}};
 
-constexpr ThresholdPerLang THRESHOLD_ALTERNATES_PER_LANG = {0.35, 0.40, 0.40};
+constexpr ThresholdPerLang THRESHOLD_ALTERNATES_PER_LANG = {0.35, 0.35, 0.35};
 constexpr ThresholdPerLang THRESHOLD_ROLLS_PER_LANG = {0.35, 0.35, 0.35};
 constexpr ThresholdPerLang THRESHOLD_REDIRECTS_PER_LANG = {0.06, 0.08, 0.11};
 
 constexpr double WEIGHT_SFB = 1;
 constexpr double WEIGHT_SFS = 1;
-constexpr array<double, NUM_BUCKET> WEIGHT_FINGER_USAGE = {8, 4, 2, 1};
-constexpr double WEIGHT_FINGER_USAGE_NORMALIZE =
-    1.0 /
-    accumulate(WEIGHT_FINGER_USAGE.begin(), WEIGHT_FINGER_USAGE.end(), 0.0);
-constexpr double WEIGHT_FINGER_USAGE_OVERALL =
-    0.01 * WEIGHT_FINGER_USAGE_NORMALIZE;
 
-constexpr double WEIGHT_SFB_PER_FINGER_OVERALL = 1;
-constexpr array<double, NUM_BUCKET> WEIGHT_SFB_PER_FINGER = {8, 4, 2, 1};
+constexpr double WEIGHT_FINGER_USAGE_OVERALL = 0.01 * 0;
+constexpr array<double, NUM_BUCKET> WEIGHT_FINGER_USAGE = {4, 3, 2, 1};
 
-constexpr double WEIGHT_ALTERNATES = 0.01;
-constexpr double WEIGHT_ROLLS = 0.01;
-constexpr double WEIGHT_REDIRECT = 0.02;
+constexpr double WEIGHT_SFB_PER_FINGER_OVERALL = 1 * 0;
+constexpr array<double, NUM_BUCKET> WEIGHT_SFB_PER_FINGER = {4, 3, 2, 1};
+
+constexpr double WEIGHT_ALTERNATES = 0.001 * 0;
+constexpr double WEIGHT_ROLLS = 0.001 * 0;
+constexpr double WEIGHT_REDIRECT = 0.001 * 0;
 
 // [bucket_id][bucket_cnt_id] => string
 using Buckets = array<vector<vector<char>>, NUM_BUCKET>;
@@ -242,11 +243,13 @@ struct LayoutStats {
                                  BucketToHand const& bucket_to_hand,
                                  int const bucket_id, int const bucket_cnt_id,
                                  int const hand_id, int const modifier) {
-    int const num_assigned_buckets =
-        transform_reduce(bucket_to_hand.begin(), bucket_to_hand.end(), 0,
-                         plus<int>(), [&](vector<int> const& hand_assignment) {
-                           return hand_assignment.size();
-                         });
+    int const num_assigned_buckets = [&]() {
+      int total_size = 0;
+      for (auto const& hand_assignment : bucket_to_hand)
+        total_size += hand_assignment.size();
+      return total_size;
+    }();
+
     int const current_bucket_flat_id = toFlatBucketId(bucket_id, bucket_cnt_id);
     for (int i = 0; i < num_assigned_buckets; ++i) {
       for (int j = 0; j < num_assigned_buckets; ++j) {
