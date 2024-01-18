@@ -1,0 +1,63 @@
+==========================
+Layout:
+z d r b v  j q u o . 
+s t n c g  l m e a y 
+f k x p w  h , ; ' i 
+
+==== Stats static/oxeylyzer_stats/english.json
+SFB: 0.741 | SFS: 5.627
+SFB (2U): 0.021 | SFS (2U): 0.376
+HSB: 3.472 | HSS: 5.449
+FSB: 0.163 | FSS: 0.165
+Finger Usage:
+   8.599, 10.102, 
+   13.321, 15.986, 
+   12.988, 14.673, 
+   11.530, 12.447, 
+SFB per bucket Usage:
+   0.021, 0.135, 
+   0.011, 0.094, 
+   0.146, 0.153, 
+   0.022, 0.158, 
+Total alternates: 35.636
+Total rolls: 47.967
+Total redirect: 4.986
+
+==== Stats static/oxeylyzer_stats/450k.json
+SFB: 0.918 | SFS: 6.250
+SFB (2U): 0.030 | SFS (2U): 0.222
+HSB: 2.828 | HSS: 5.583
+FSB: 0.094 | FSS: 0.216
+Finger Usage:
+   9.717, 10.887, 
+   10.569, 15.350, 
+   14.367, 14.514, 
+   13.270, 11.321, 
+SFB per bucket Usage:
+   0.031, 0.052, 
+   0.026, 0.127, 
+   0.199, 0.246, 
+   0.082, 0.155, 
+Total alternates: 39.896
+Total rolls: 43.767
+Total redirect: 6.830
+
+==== Stats static/oxeylyzer_stats/indonesian.json
+SFB: 0.838 | SFS: 8.165
+SFB (2U): 0.153 | SFS (2U): 0.917
+HSB: 3.682 | HSS: 10.015
+FSB: 0.249 | FSS: 1.120
+Finger Usage:
+   4.872, 10.458, 
+   13.745, 21.039, 
+   14.716, 12.615, 
+   10.440, 11.758, 
+SFB per bucket Usage:
+   0.007, 0.187, 
+   0.202, 0.049, 
+   0.144, 0.035, 
+   0.008, 0.205, 
+Total alternates: 46.344
+Total rolls: 37.684
+Total redirect: 10.149
+

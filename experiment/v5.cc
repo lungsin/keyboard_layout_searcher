@@ -17,6 +17,13 @@ constexpr int NUM_BUCKET = 4;
 constexpr int BUCKET_CAP[NUM_BUCKET] = {3, 3, 3, 6};
 constexpr int NUM_HANDS = 2;
 constexpr int NUM_FINGERS = NUM_BUCKET * NUM_HANDS;
+// finger type => bucket_id
+enum FingerType {
+  PINKY_FINGER = 0,
+  MIDDLE_FINGER = 1,
+  RING_FINGER = 2,
+  INDEX_FINGER = 3,
+};
 
 const int NUM_STATS = 3;
 const string STATS_FNAME[NUM_STATS] = {
@@ -27,15 +34,15 @@ const string STATS_FNAME[NUM_STATS] = {
 const double STATS_WEIGHT[NUM_STATS] = {
     4,
     1,
-    4,
+    1,
 };
 
 const string RECURVA_PATH = "static/kb/recurva.kb";
+const string MAYA_PATH = "static/kb/maya.kb";
 
 constexpr int NUM_ROWS = 3;
-constexpr int TOP_ROW = 0;
-constexpr int MIDDLE_ROW = 1;
-constexpr int BOTTOM_ROW = 2;
+enum RowType { TOP_ROW = 0, MIDDLE_ROW = 1, BOTTOM_ROW = 2 };
+constexpr int NUM_KEYS_PER_ROW[NUM_BUCKET] = {1, 1, 1, 2};
 
 // Thresholds and weights config
 constexpr double PERCENT = 0.01;
@@ -47,35 +54,71 @@ constexpr ThresholdPerLang THRESHOLD_SFB_PER_LANG = {0.0090, 0.0095, 0.0100};
 constexpr double AGGREGATED_THRESHOLD_SFS = 8.5 * PERCENT;
 constexpr ThresholdPerLang THRESHOLD_SFS_PER_LANG = {0.065, 0.075, 0.085};
 
-constexpr double AGGREGATED_THRESHOLD_SFB_2U = 0.2 * PERCENT;
+constexpr double AGGREGATED_THRESHOLD_SFB_2U = 0.1 * PERCENT;
 constexpr ThresholdPerLang THRESHOLD_SFB_2U_PER_LANG = {
-    0.2 * PERCENT, 0.2 * PERCENT, 0.2 * PERCENT};
-constexpr double AGGREGATED_THRESHOLD_SFS_2U = 1 * PERCENT;
+    0.1 * PERCENT, 0.1 * PERCENT, 0.1 * PERCENT};
+constexpr double AGGREGATED_THRESHOLD_SFS_2U = 1.5 * PERCENT;
 constexpr ThresholdPerLang THRESHOLD_SFS_2U_PER_LANG = {
-    0.5 * PERCENT, 0.5 * PERCENT, 1.5 * PERCENT};
+    0.5 * PERCENT, 0.5 * PERCENT, 0.5 * PERCENT};
 
+// Scissors
+constexpr bool ENABLE_SCISSORS_THRESHOLD = true;
+constexpr double AGGREGATED_THRESHOLD_HSB = 6 * PERCENT;
+constexpr ThresholdPerLang THRESHOLD_HSB_PER_LANG = {
+    5 * PERCENT,
+    5 * PERCENT,
+    6 * PERCENT,
+};
+constexpr double AGGREGATED_THRESHOLD_HSS = 12 * PERCENT;
+constexpr ThresholdPerLang THRESHOLD_HSS_PER_LANG = {
+    8 * PERCENT,
+    8 * PERCENT,
+    12 * PERCENT,
+};
+
+constexpr double AGGREGATED_THRESHOLD_FSB = 0.6 * PERCENT;
+constexpr ThresholdPerLang THRESHOLD_FSB_PER_LANG = {
+    0.3 * PERCENT,
+    0.3 * PERCENT,
+    0.6 * PERCENT,
+};
+constexpr double AGGREGATED_THRESHOLD_FSS = 1.5 * PERCENT;
+constexpr ThresholdPerLang THRESHOLD_FSS_PER_LANG = {
+    0.3 * PERCENT,
+    0.3 * PERCENT,
+    1.5 * PERCENT,
+};
+
+// Finger-wise threshold
 constexpr bool ENABLE_FINGER_THRESHOLD = true;
 constexpr ThresholdFingerUsage THRESHOLD_FINGER_USAGE = {{
-    {0.12, 0.14, 0.25, 0.30},
-    {0.14, 0.15, 0.25, 0.30},
-    {0.14, 0.15, 0.25, 0.30},
+    {0.12, 0.16, 0.25, 0.30},
+    {0.14, 0.16, 0.25, 0.30},
+    {0.14, 0.22, 0.25, 0.30},
 }};
 
 constexpr bool ENABLE_SFB_PER_FINGER_THRESHOLD = true;
 constexpr ThresholdFingerUsage THRESHOLD_SFB_PER_FINGER = {{
-    {0.001, 0.02, 0.10, 0.10},
+    {0.15 * PERCENT, 1 * PERCENT, 0.10, 0.10},
     {0.1, 0.1, 0.1, 0.1},
     {0.1, 0.1, 0.1, 0.1},
 }};
 
+// Trigram threshold
 constexpr ThresholdPerLang THRESHOLD_ALTERNATES_PER_LANG = {0.30, 0.30, 0.30};
 constexpr ThresholdPerLang THRESHOLD_ROLLS_PER_LANG = {0.30, 0.30, 0.30};
 constexpr ThresholdPerLang THRESHOLD_REDIRECTS_PER_LANG = {0.08, 0.15, 0.15};
 
 constexpr double WEIGHT_SFB = 1;
 constexpr double WEIGHT_SFS = 1;
-constexpr double WEIGHT_SFB_2U = 1;
-constexpr double WEIGHT_SFS_2U = 1;
+constexpr double WEIGHT_SFB_2U = 2;
+constexpr double WEIGHT_SFS_2U = 2;
+
+// Scissors
+constexpr double WEIGHT_HSB = 0.1 * 0;
+constexpr double WEIGHT_HSS = 0.1 * 0;
+constexpr double WEIGHT_FSB = 1 * 0;
+constexpr double WEIGHT_FSS = 1 * 0;
 
 constexpr double WEIGHT_FINGER_USAGE_OVERALL = 0.01 * 0;
 constexpr array<double, NUM_BUCKET> WEIGHT_FINGER_USAGE = {4, 3, 2, 1};
@@ -95,6 +138,17 @@ using RowToBucketKeyId = array<vector<int>, NUM_ROWS>;
 using BucketRowAssignment =
     array<array<RowToBucketKeyId, NUM_HANDS>, NUM_BUCKET>;
 using FlatBucketId = int;
+
+using Row = vector<char>;
+using Rows = array<Row, NUM_ROWS>;
+using Layout = array<array<Rows, NUM_HANDS>, NUM_BUCKET>;
+
+inline Row getRowFromBucket(Bucket const& bucket, RowType row_type) {
+  int const num_keys_per_row = bucket.size() / NUM_ROWS;
+  int const offset = num_keys_per_row * row_type;
+  return Row(bucket.begin() + offset,
+             bucket.begin() + offset + num_keys_per_row);
+}
 
 using FastStats = CompactStats<MAX_ASCII>;
 
@@ -161,12 +215,17 @@ using TrigramBucketStats =
     array<array<array<double, NUM_FINGERS>, NUM_FINGERS>, NUM_FINGERS>;
 
 struct LayoutStats {
+  // bigram stats
   double sfb = 0, sfs = 0;
 
   array<array<double, NUM_HANDS>, NUM_BUCKET> sfb_bucket = {{}},
                                               finger_usage = {{}};
 
   double sfb_2u = 0, sfs_2u = 0;
+
+  // Half & full scisors stats
+  double hsb = 0, fsb = 0;
+  double hss = 0, fss = 0;
 
   // trigram stats
   double alternates = 0, inverse_alternates = 0;
@@ -315,13 +374,12 @@ struct LayoutStats {
     }
   }
 
-  inline void updateStatsBucketRowAssignment(
-      Bucket const& bucket, RowToBucketKeyId const& row_to_bucket_key_id,
-      int const modifier) {
-    for (auto const top_key_id : row_to_bucket_key_id[TOP_ROW]) {
-      char const top_key = bucket[top_key_id];
-      for (auto const bottom_key_id : row_to_bucket_key_id[BOTTOM_ROW]) {
-        char const bottom_key = bucket[bottom_key_id];
+  inline void update2UStats(Layout const& layout, int const bucket_id,
+                            int const hand_id, int const modifier) {
+    auto const& rows = layout[bucket_id][hand_id];
+
+    for (char const top_key : rows[RowType::TOP_ROW]) {
+      for (char const bottom_key : rows[RowType::BOTTOM_ROW]) {
         double const delta_sfb_2u =
             corpus_stats.bigrams[top_key][bottom_key] * modifier;
         double const delta_sfs_2u =
@@ -332,6 +390,71 @@ struct LayoutStats {
 
         score += delta_sfb_2u * WEIGHT_SFB_2U;
         score += delta_sfs_2u * WEIGHT_SFS_2U;
+      }
+    }
+  }
+
+  inline void updateScissorsStats(Layout const& layout, int const bucket_id,
+                                  int const hand_id, int const modifier) {
+    auto const& rows = layout[bucket_id][hand_id];
+
+    auto const& top_row = rows[RowType::TOP_ROW];
+    auto const& middle_row = rows[RowType::MIDDLE_ROW];
+    auto const& bottom_row = rows[RowType::BOTTOM_ROW];
+
+    // Update scissors
+    auto updateHalfScissors = [&](Row const& row1, Row const& row2) {
+      for (char const key1 : row1)
+        for (char const key2 : row2) {
+          double const delta_hsb = corpus_stats.bigrams[key1][key2] * modifier;
+          double const delta_hss =
+              corpus_stats.skipgrams[key1][key2] * modifier;
+
+          hsb += delta_hsb;
+          hss += delta_hss;
+          score += delta_hsb * WEIGHT_HSB + delta_hss * WEIGHT_HSS;
+        }
+    };
+
+    auto updateFullScissors = [&](Row const& row1, Row const& row2) {
+      for (char const key1 : row1)
+        for (char const key2 : row2) {
+          double const delta_fsb = corpus_stats.bigrams[key1][key2] * modifier;
+          double const delta_fss =
+              corpus_stats.skipgrams[key1][key2] * modifier;
+
+          fsb += delta_fsb;
+          fss += delta_fss;
+          score += delta_fsb * WEIGHT_FSB + delta_fss * WEIGHT_FSS;
+        }
+    };
+
+    bool const is_current_finger_middle_or_ring =
+        bucket_id == MIDDLE_FINGER || bucket_id == RING_FINGER;
+    for (int other_bucket_id = 0; other_bucket_id < bucket_id;
+         ++other_bucket_id) {
+      bool const is_other_finger_middle_or_ring =
+          other_bucket_id == MIDDLE_FINGER || other_bucket_id == RING_FINGER;
+      if (!is_current_finger_middle_or_ring && !is_other_finger_middle_or_ring)
+        continue;
+
+      auto const& other_rows = layout[other_bucket_id][hand_id];
+      auto const& other_top_row = other_rows[RowType::TOP_ROW];
+      auto const& other_middle_row = other_rows[RowType::MIDDLE_ROW];
+      auto const& other_bottom_row = other_rows[RowType::BOTTOM_ROW];
+
+      // Current finger hits the lower row
+      if (is_current_finger_middle_or_ring) {
+        updateHalfScissors(bottom_row, other_middle_row);
+        updateHalfScissors(middle_row, other_top_row);
+        updateFullScissors(bottom_row, other_top_row);
+      }
+
+      // Other finger hits the lower row
+      if (is_other_finger_middle_or_ring) {
+        updateHalfScissors(other_bottom_row, middle_row);
+        updateHalfScissors(other_middle_row, top_row);
+        updateFullScissors(other_bottom_row, top_row);
       }
     }
   }
@@ -346,6 +469,8 @@ struct PartialLayout {
   BucketToHand bucket_to_hand = {};
 
   BucketRowAssignment bucket_row_assignment = {};
+
+  Layout final_layout;
 
   PartialLayout() = default;
 
@@ -368,22 +493,23 @@ struct PartialLayout {
       }
     }
 
-    for (int bucket_id = 0; bucket_id < NUM_BUCKET; ++bucket_id) {
-      for (int bucket_cnt_id = 0; bucket_cnt_id < NUM_HANDS; ++bucket_cnt_id) {
+    precomputeTrigramBucketStats();
+
+    for (int bucket_id = 0; bucket_id < NUM_BUCKET; ++bucket_id)
+      for (int bucket_cnt_id = 0; bucket_cnt_id < NUM_HANDS; ++bucket_cnt_id)
         assignBucketToHand(bucket_id, bucket_cnt_id, bucket_cnt_id);
-      }
-    }
 
     for (int bucket_id = 0; bucket_id < NUM_BUCKET; ++bucket_id) {
       for (int bucket_cnt_id = 0; bucket_cnt_id < NUM_HANDS; ++bucket_cnt_id) {
-        auto const& bucket = layout[bucket_id][bucket_cnt_id];
-        RowToBucketKeyId row_to_bucket_id;
-        for (int i = 0; i < bucket.size(); i++) {
-          row_to_bucket_id[i / (bucket.size() / NUM_ROWS)].push_back(i);
-        }
-        setBucketRowPermut(bucket_id, bucket_cnt_id, row_to_bucket_id);
+        vector<int> identity_permut(BUCKET_CAP[bucket_id]);
+        iota(identity_permut.begin(), identity_permut.end(), 0);
+        setRowPermutFor2U(bucket_id, bucket_cnt_id, identity_permut);
       }
     }
+
+    for (int bucket_id = 0; bucket_id < NUM_BUCKET; ++bucket_id)
+      for (int hand_id = 0; hand_id < NUM_HANDS; ++hand_id)
+        setSwapTopBottomRow(bucket_id, hand_id, false);
   }
 
   inline void updateStats(int const bucket_id, int const bucket_cnt_id,
@@ -441,27 +567,59 @@ struct PartialLayout {
     bucket_to_hand[bucket_id].pop_back();
   }
 
-  inline void updateStatsBucketRowPermut(int const bucket_id,
-                                         int const bucket_cnt_id,
-                                         int const modifier) {
-    aggregated_stats.updateStatsBucketRowAssignment(
-        buckets[bucket_id][bucket_cnt_id],
-        bucket_row_assignment[bucket_id][bucket_cnt_id], modifier);
+  inline void update2UStats(int const bucket_id, int const hand_id,
+                            int const modifier) {
+    aggregated_stats.update2UStats(final_layout, bucket_id, hand_id, modifier);
     for (auto& stats : stats_per_language)
-      stats.updateStatsBucketRowAssignment(
-          buckets[bucket_id][bucket_cnt_id],
-          bucket_row_assignment[bucket_id][bucket_cnt_id], modifier);
+      stats.update2UStats(final_layout, bucket_id, hand_id, modifier);
   }
 
-  inline void setBucketRowPermut(int const bucket_id, int const bucket_cnt_id,
-                                 RowToBucketKeyId const& row_to_bucket_id) {
-    bucket_row_assignment[bucket_id][bucket_cnt_id] = row_to_bucket_id;
-    updateStatsBucketRowPermut(bucket_id, bucket_cnt_id, 1);
+  inline void setRowPermutFor2U(int const bucket_id, int const bucket_cnt_id,
+                                vector<int> const& keys_permut) {
+    int const hand_id = bucket_to_hand[bucket_id][bucket_cnt_id];
+    auto const& bucket = buckets[bucket_id][bucket_cnt_id];
+
+    auto& finger_stack = final_layout[bucket_id][hand_id];
+    for (int i = 0; i < NUM_ROWS; ++i) finger_stack[i].clear();
+
+    int const num_keys_per_row = NUM_KEYS_PER_ROW[bucket_id];
+    for (int i = 0; i < bucket.size(); ++i) {
+      finger_stack[i / num_keys_per_row].push_back(bucket[keys_permut[i]]);
+    }
+    update2UStats(bucket_id, hand_id, 1);
   }
 
-  inline void unsetBucketRowPermut(int const bucket_id, int const bucket_cnt_id,
-                                   RowToBucketKeyId const& row_to_bucket_id) {
-    updateStatsBucketRowPermut(bucket_id, bucket_cnt_id, -1);
+  inline void unsetRowPermutFor2U(int const bucket_id, int const bucket_cnt_id,
+                                  vector<int> const& finger_keys_permut) {
+    int const hand_id = bucket_to_hand[bucket_id][bucket_cnt_id];
+    update2UStats(bucket_id, hand_id, -1);
+  }
+
+  inline void updateScissorsStats(int const bucket_id, int const hand_id,
+                                  int const modifier) {
+    aggregated_stats.updateScissorsStats(final_layout, bucket_id, hand_id,
+                                         modifier);
+    for (auto& stats : stats_per_language)
+      stats.updateScissorsStats(final_layout, bucket_id, hand_id, modifier);
+  }
+
+  inline void swapTopBottomRow(int const bucket_id, int const hand_id,
+                               bool const is_swap) {
+    if (!is_swap) return;
+    auto& finger_stack = final_layout[bucket_id][hand_id];
+    finger_stack[RowType::TOP_ROW].swap(finger_stack[RowType::BOTTOM_ROW]);
+  }
+
+  inline void setSwapTopBottomRow(int const bucket_id, int const hand_id,
+                                  bool const is_swap) {
+    swapTopBottomRow(bucket_id, hand_id, is_swap);
+    updateScissorsStats(bucket_id, hand_id, 1);
+  }
+
+  inline void unsetSwapTopBottomRow(int const bucket_id, int const hand_id,
+                                    bool const is_swap) {
+    updateScissorsStats(bucket_id, hand_id, -1);
+    swapTopBottomRow(bucket_id, hand_id, is_swap);
   }
 };
 
@@ -470,21 +628,206 @@ PartialLayout partial_layout, best_partial_layout;
 // Bruteforce metadata
 int recursion_depth = 0;
 long long num_iterations = 0;
-long long num_done = 0, num_bucket_row_assignment_done = 0,
-          num_shuffle_done = 0;
+long long num_brute_bucket_done = 0;
+long long num_shuffle_done = 0;
+long long num_row_permut_2u_done = 0;
+long long num_brute_scissors_done = 0;
 
-inline void doneShuffle();
-void shuffleBucketToHand(int bucket_id);
-inline void doneBruteBucketRowAssignment();
-void bruteRowKeysInBucket(int const bucket_id, int const bucket_cnt_id);
+inline void doneBruteScissors() {
+  assert(best_partial_layout.aggregated_stats.score >=
+         partial_layout.aggregated_stats.score);
+  best_partial_layout = partial_layout;
+
+  if (num_brute_scissors_done % 10 == 0) {
+    cerr << "Found new layout. Iter: " << num_brute_scissors_done
+         << ",Score: " << best_partial_layout.aggregated_stats.score << endl;
+  }
+  ++num_brute_scissors_done;
+}
+
+inline bool isPruneableBruteScissors() {
+  ++num_iterations;
+  LayoutStats const& aggregated_layout_stats = partial_layout.aggregated_stats;
+
+  if (aggregated_layout_stats.score >
+      best_partial_layout.aggregated_stats.score)
+    return true;
+
+  // Scissors
+  if (ENABLE_SCISSORS_THRESHOLD) {
+    if (aggregated_layout_stats.hsb > AGGREGATED_THRESHOLD_HSB ||
+        aggregated_layout_stats.hss > AGGREGATED_THRESHOLD_HSS ||
+        aggregated_layout_stats.fsb > AGGREGATED_THRESHOLD_FSB ||
+        aggregated_layout_stats.fss > AGGREGATED_THRESHOLD_FSS)
+      return true;
+
+    for (int i = 0; i < NUM_STATS; ++i) {
+      auto const& stats = partial_layout.stats_per_language[i];
+      if (stats.hsb > THRESHOLD_HSB_PER_LANG[i] ||
+          stats.hss > THRESHOLD_HSS_PER_LANG[i] ||
+          stats.fsb > THRESHOLD_FSB_PER_LANG[i] ||
+          stats.fss > THRESHOLD_FSS_PER_LANG[i])
+        return true;
+    }
+  }
+
+  return false;
+}
+
+void bruteScissors(int bucket_id, int hand_id) {
+  if (isPruneableBruteScissors()) {
+    return;
+  }
+
+  if (bucket_id == NUM_BUCKET) {
+    doneBruteScissors();
+    return;
+  }
+
+  if (hand_id == NUM_HANDS) {
+    bruteScissors(bucket_id + 1, 0);
+    return;
+  }
+
+  auto bruteNext = [&](bool const& is_swap_top_bottom_row) {
+    partial_layout.setSwapTopBottomRow(bucket_id, hand_id,
+                                       is_swap_top_bottom_row);
+    bruteScissors(bucket_id, hand_id + 1);
+    partial_layout.unsetSwapTopBottomRow(bucket_id, hand_id,
+                                         is_swap_top_bottom_row);
+  };
+  bruteNext(false);
+  bruteNext(true);
+}
+
+inline void doneBruteRowPermutFor2U() {
+  assert(best_partial_layout.aggregated_stats.score >=
+         partial_layout.aggregated_stats.score);
+  bruteScissors(0, 0);
+  ++num_row_permut_2u_done;
+}
+
+inline bool isPrunableBruteRowPermutFor2U() {
+  ++num_iterations;
+  LayoutStats const& aggregated_layout_stats = partial_layout.aggregated_stats;
+
+  if (aggregated_layout_stats.score >
+      best_partial_layout.aggregated_stats.score)
+    return true;
+
+  // SFB & SFS 2U
+  if (aggregated_layout_stats.sfb_2u > AGGREGATED_THRESHOLD_SFB_2U ||
+      aggregated_layout_stats.sfs_2u > AGGREGATED_THRESHOLD_SFS_2U)
+    return true;
+
+  for (int i = 0; i < NUM_STATS; ++i) {
+    auto const& stats = partial_layout.stats_per_language[i];
+    if (stats.sfb_2u > THRESHOLD_SFB_2U_PER_LANG[i] ||
+        stats.sfs_2u > THRESHOLD_SFS_2U_PER_LANG[i])
+      return true;
+  }
+
+  return false;
+}
+
+template <int num_keys, int num_results>
+constexpr array<array<int, num_keys>, num_results> getRowPermutFor2U() {
+  array<int, num_keys> permut;
+  int const num_keys_per_row = num_keys / NUM_ROWS;
+  for (int i = 0; i < num_keys; i++) {
+    permut[i] = i / num_keys_per_row;
+  }
+
+  auto isPermut = [](array<int, num_keys> const& arr) {
+    array<int, num_keys> arr2 = arr;
+    sort(arr2.begin(), arr2.end());
+    for (int i = 0; i < arr2.size(); ++i)
+      if (arr2[i] != i) return false;
+    return true;
+  };
+
+  auto rowPermutToKeyPermut = [&](array<int, num_keys> const& row_permut) {
+    array<int, NUM_ROWS> freq = {{}};
+    array<int, num_keys> result;
+    for (int i = 0; i < num_keys; ++i) {
+      int const row = row_permut[i];
+      result[freq[row] + row * num_keys_per_row] = i;
+      ++freq[row];
+    }
+    assert(isPermut(result));
+    return result;
+  };
+
+  // Remove top and bottom row symmetry
+  auto isTopFirst = [&](array<int, num_keys> const& result) {
+    for (int elem : result) {
+      if (elem == RowType::MIDDLE_ROW)
+        continue;
+      else if (elem == RowType::TOP_ROW)
+        return true;
+      else if (elem == RowType::BOTTOM_ROW)
+        return false;
+    }
+    assert(false);
+  };
+
+  array<array<int, num_keys>, num_results> results;
+  int i = 0;
+  do {
+    if (!isTopFirst(permut)) continue;
+    assert(i < num_results);
+    results[i++] = rowPermutToKeyPermut(permut);
+  } while (next_permutation(permut.begin(), permut.end()));
+  assert(i == num_results);
+  return results;
+}
+
+const auto ROW_PERMUT_FOR_2U_3_KEYS = getRowPermutFor2U<3, 3>();
+const auto ROW_PERMUT_FOR_2U_6_KEYS = getRowPermutFor2U<6, 45>();
+
+void bruteRowPermutFor2U(int const bucket_id, int const hand_id) {
+  if (isPrunableBruteRowPermutFor2U()) {
+    return;
+  }
+
+  if (bucket_id == NUM_BUCKET) {
+    doneBruteRowPermutFor2U();
+    return;
+  }
+
+  if (hand_id == NUM_HANDS) {
+    bruteRowPermutFor2U(bucket_id + 1, 0);
+    return;
+  }
+
+  auto bruteNext = [&](vector<int> const& permut) {
+    partial_layout.setRowPermutFor2U(bucket_id, hand_id, permut);
+    bruteRowPermutFor2U(bucket_id, hand_id + 1);
+    partial_layout.unsetRowPermutFor2U(bucket_id, hand_id, permut);
+  };
+
+  auto const& buckets = partial_layout.buckets[bucket_id][hand_id];
+  if (buckets.size() == 3) {
+    for (auto const& permut : ROW_PERMUT_FOR_2U_3_KEYS) {
+      bruteNext(vector<int>(permut.begin(), permut.end()));
+    }
+
+  } else if (buckets.size() == 6) {
+    for (auto const& permut : ROW_PERMUT_FOR_2U_6_KEYS) {
+      bruteNext(vector<int>(permut.begin(), permut.end()));
+    }
+  } else {
+    // Not supported
+    assert(false);
+  }
+}
+
+// [Stage] Shuffle bucket to hand
 
 inline void doneShuffle() {
   assert(best_partial_layout.aggregated_stats.score >=
          partial_layout.aggregated_stats.score);
-
-  // DONE ORDERING
-  bruteRowKeysInBucket(0, 0);
-  // best_partial_layout = partial_layout;
+  bruteRowPermutFor2U(0, 0);
   ++num_shuffle_done;
 }
 
@@ -534,132 +877,14 @@ void shuffleBucketToHand(int bucket_id) {
   }
 }
 
-inline bool isBruteBucketRowAssignmentPruneable() {
-  ++num_iterations;
-  LayoutStats const& aggregated_layout_stats = partial_layout.aggregated_stats;
-
-  if (aggregated_layout_stats.score >
-      best_partial_layout.aggregated_stats.score)
-    return true;
-
-  if (aggregated_layout_stats.sfb_2u > AGGREGATED_THRESHOLD_SFB_2U ||
-      aggregated_layout_stats.sfs_2u > AGGREGATED_THRESHOLD_SFS_2U)
-    return true;
-
-  for (int i = 0; i < NUM_STATS; ++i) {
-    auto const& stats = partial_layout.stats_per_language[i];
-    if (stats.sfb_2u > THRESHOLD_SFB_2U_PER_LANG[i] ||
-        stats.sfs_2u > THRESHOLD_SFS_2U_PER_LANG[i])
-      return true;
-  }
-
-  return false;
-}
-
-inline void doneBruteBucketRowAssignment() {
-  assert(best_partial_layout.aggregated_stats.score >=
-         partial_layout.aggregated_stats.score);
-  // DONE ORDERING
-  best_partial_layout = partial_layout;
-  // shuffleBucketToHand(0);
-  ++num_bucket_row_assignment_done;
-}
-
-inline void setBucketRowPermut(int const bucket_id, int const bucket_cnt_id,
-                               RowToBucketKeyId const& row_to_bucket_id) {
-  partial_layout.setBucketRowPermut(bucket_id, bucket_cnt_id, row_to_bucket_id);
-}
-
-inline void unsetBucketRowPermut(int const bucket_id, int const bucket_cnt_id,
-                                 RowToBucketKeyId const& row_to_bucket_id) {
-  partial_layout.unsetBucketRowPermut(bucket_id, bucket_cnt_id,
-                                      row_to_bucket_id);
-}
-
-template <int num_keys, int num_results>
-constexpr array<array<int, num_keys>, num_results> getRowPermutationFor2U() {
-  array<int, num_keys> permut;
-  for (int i = 0; i < num_keys; i++) {
-    permut[i] = i / (num_keys / NUM_ROWS);
-  }
-
-  auto isOk = [](array<int, num_keys> const& permut) {
-    for (int elem : permut) {
-      if (elem == MIDDLE_ROW)
-        continue;
-      else if (elem == TOP_ROW)
-        return true;
-      else if (elem == BOTTOM_ROW)
-        return false;
-    }
-    assert(false);
-  };
-
-  array<array<int, num_keys>, num_results> results;
-  int i = 0;
-  do {
-    if (isOk(permut)) {
-      assert(i < num_results);
-      results[i++] = permut;
-    }
-  } while (next_permutation(permut.begin(), permut.end()));
-  return results;
-}
-
-const array<array<int, 3>, 3> ROW_PERMUT_FOR_2U_3_KEYS =
-    getRowPermutationFor2U<3, 3>();
-const array<array<int, 6>, 45> ROW_PERMUT_FOR_2U_6_KEYS =
-    getRowPermutationFor2U<6, 45>();
-
-void bruteRowKeysInBucket(int const bucket_id, int const bucket_cnt_id) {
-  if (isBruteBucketRowAssignmentPruneable()) {
-    return;
-  }
-
-  if (bucket_id == NUM_BUCKET) {
-    doneBruteBucketRowAssignment();
-    return;
-  }
-
-  if (bucket_cnt_id == NUM_HANDS) {
-    bruteRowKeysInBucket(bucket_id + 1, 0);
-    return;
-  }
-
-  auto bruteNext = [&](vector<int> const& permut) {
-    RowToBucketKeyId row_to_bucket_key_id;
-    for (int bucket_key_id = 0; bucket_key_id < permut.size();
-         ++bucket_key_id) {
-      row_to_bucket_key_id[permut[bucket_key_id]].push_back(bucket_key_id);
-    }
-    setBucketRowPermut(bucket_id, bucket_cnt_id, row_to_bucket_key_id);
-    bruteRowKeysInBucket(bucket_id, bucket_cnt_id + 1);
-    unsetBucketRowPermut(bucket_id, bucket_cnt_id, row_to_bucket_key_id);
-  };
-
-  auto const& buckets = partial_layout.buckets[bucket_id][bucket_cnt_id];
-  if (buckets.size() == 3) {
-    for (auto const& permut : ROW_PERMUT_FOR_2U_3_KEYS) {
-      bruteNext(vector<int>(permut.begin(), permut.end()));
-    }
-  } else if (buckets.size() == 6) {
-    for (auto const& permut : ROW_PERMUT_FOR_2U_6_KEYS) {
-      bruteNext(vector<int>(permut.begin(), permut.end()));
-    }
-  } else {
-    // Not supported
-    assert(false);
-  }
-}
+// [Stage] Brute force bucket
 
 inline void done() {
   assert(best_partial_layout.aggregated_stats.score >=
          partial_layout.aggregated_stats.score);
-  // DONE ORDERING
   partial_layout.precomputeTrigramBucketStats();
-  // bruteRowKeysInBucket(0, 0);
   shuffleBucketToHand(0);
-  ++num_done;
+  ++num_brute_bucket_done;
 }
 
 inline bool isPrunable() {
@@ -770,74 +995,54 @@ void brute(int key_id) {
   }
 }
 
-void printBuckets(Buckets const& buckets, BucketToHand const& bucket_to_hand,
-                  BucketRowAssignment const& bucket_row_assignment) {
-  printf("==========================\n");
-  printf("Bucket:\n");
-
-  Buckets layout = buckets;
-  // row, hand, bucket
-  for (int i = 0; i < NUM_BUCKET; ++i) {
-    for (int j = 0; j < NUM_HANDS; ++j) {
-      auto const& row_to_bucket_key_id = bucket_row_assignment[i][j];
-      Bucket const& bucket = buckets[i][j];
-      Bucket result;
-      for (int row_id = 0; row_id < NUM_ROWS; ++row_id) {
-        for (auto const bucket_key_id : row_to_bucket_key_id[row_id])
-          result.push_back(bucket[bucket_key_id]);
-      }
-      layout[i][j] = result;
-      assert(result.size() == buckets[i][j].size());
-      assert(result.size() == BUCKET_CAP[i]);
-    }
-  }
-
-  for (int i = 0; i < NUM_BUCKET; i++) {
-    assert(layout[i].size() == NUM_HANDS &&
-           bucket_to_hand[i].size() == NUM_HANDS);
-    if (bucket_to_hand[i][0]) swap(layout[i][0], layout[i][1]);
-  }
+void printFinalLayout(ostream& out, Layout const& layout) {
+  out << "==========================\n";
+  out << "Layout:\n";
 
   for (int r = 0; r < NUM_ROWS; r++) {
-    for (int i = 0; i < NUM_BUCKET; ++i) {
-      int const offset = layout[i][0].size() / NUM_ROWS;
-      for (int j = 0; j < offset; j++) {
-        printf("%c ", layout[i][0][r * offset + j]);
-      }
-    }
-    printf(" ");
-    for (int i = NUM_BUCKET - 1; i >= 0; --i) {
-      int const offset = layout[i][1].size() / NUM_ROWS;
-      for (int j = 0; j < offset; j++) {
-        printf("%c ", layout[i][1][r * offset + j]);
-      }
-    }
-    printf("\n");
-  }
+    for (int i = 0; i < NUM_BUCKET; ++i)
+      for (char const key : layout[i][0][r]) out << key << " ";
 
-  printf("\n");
+    out << " ";
+    for (int i = NUM_BUCKET - 1; i >= 0; --i)
+      for (char const key : layout[i][1][r]) out << key << " ";
+
+    out << endl;
+  }
+  out << endl;
 }
 
-void printBucketStats(LayoutStats const& layout_stats) {
+void printBucketStats(LayoutStats const& layout_stats,
+                      BucketToHand const& bucket_to_hand) {
   printf("SFB: %2.3lf | SFS: %2.3lf\n", layout_stats.sfb * 100,
          layout_stats.sfs * 100);
 
   printf("SFB (2U): %2.3lf | SFS (2U): %2.3lf\n", layout_stats.sfb_2u * 100,
          layout_stats.sfs_2u * 100);
 
+  printf("HSB: %2.3lf | HSS: %2.3lf\n", layout_stats.hsb * 100,
+         layout_stats.hss * 100);
+
+  printf("FSB: %2.3lf | FSS: %2.3lf\n", layout_stats.fsb * 100,
+         layout_stats.fss * 100);
+
   printf("Finger Usage:\n");
   for (int i = 0; i < NUM_BUCKET; ++i) {
     printf("   ");
-    for (int j = 0; j < NUM_HANDS; j++)
-      printf("%2.3lf, ", layout_stats.finger_usage[i][j] * 100);
+    for (int j = 0; j < NUM_HANDS; j++) {
+      int const hand_id = bucket_to_hand[i][j];
+      printf("%2.3lf, ", layout_stats.finger_usage[i][hand_id] * 100);
+    }
     printf("\n");
   }
 
   printf("SFB per bucket Usage:\n");
   for (int i = 0; i < NUM_BUCKET; ++i) {
     printf("   ");
-    for (int j = 0; j < NUM_HANDS; j++)
-      printf("%2.3lf, ", layout_stats.sfb_bucket[i][j] * 100);
+    for (int j = 0; j < NUM_HANDS; j++) {
+      int const hand_id = bucket_to_hand[i][j];
+      printf("%2.3lf, ", layout_stats.sfb_bucket[i][hand_id] * 100);
+    }
     printf("\n");
   }
 
@@ -848,39 +1053,49 @@ void printBucketStats(LayoutStats const& layout_stats) {
   printf("Total redirect: %2.3lf\n", layout_stats.redirects * 100);
 }
 
+void printBaseline(string const& kb_path) {
+  cout << "Baseline layout stats from " << kb_path << endl;
+  printFinalLayout(cout, best_partial_layout.final_layout);
+  cout << "Score: " << best_partial_layout.aggregated_stats.score << endl;
+  for (int i = 0; i < NUM_STATS; i++) {
+    cout << "==== Stats " << STATS_FNAME[i] << endl;
+    printBucketStats(best_partial_layout.stats_per_language[i],
+                     best_partial_layout.bucket_to_hand);
+    cout << endl;
+  }
+  cout << endl;
+}
+
+void setBaseline(string const& kb_path) {
+  best_partial_layout.setLayout(readKb(kb_path));
+  best_partial_layout.aggregated_stats.score += 1e-9;
+  // printBaseline(kb_path);
+}
+
 int main() {
   auto [aggregated_stats, stats_list] = readAllStats();
 
   partial_layout.setStats(aggregated_stats, stats_list);
   best_partial_layout.setStats(aggregated_stats, stats_list);
 
-  best_partial_layout.setLayout(readKb(RECURVA_PATH));
-  cout << "Baseline layout stats from " << RECURVA_PATH << endl;
-  printBuckets(best_partial_layout.buckets, best_partial_layout.bucket_to_hand,
-               best_partial_layout.bucket_row_assignment);
-  cout << "Score: " << best_partial_layout.aggregated_stats.score << endl;
-  for (int i = 0; i < NUM_STATS; i++) {
-    cout << "==== Stats " << STATS_FNAME[i] << endl;
-    printBucketStats(best_partial_layout.stats_per_language[i]);
-    cout << endl;
-  }
-  cout << endl;
+  setBaseline(RECURVA_PATH);
 
   brute(0);
 
   cerr << "==== Metadata ====\nNum Iterations: " << num_iterations << endl;
-  cerr << "Num done: " << num_done << endl;
-  cerr << "Num row assign done: " << num_bucket_row_assignment_done << endl;
+  cerr << "Num brute buckets done: " << num_brute_bucket_done << endl;
   cerr << "Num shuffle done: " << num_shuffle_done << endl;
+  cerr << "Num row 2u assign done: " << num_row_permut_2u_done << endl;
+  cerr << "Num brute scissors done: " << num_brute_scissors_done << endl;
   cerr << "Best score: " << best_partial_layout.aggregated_stats.score << endl;
 
   if (num_shuffle_done == 0) return 0;
 
-  printBuckets(best_partial_layout.buckets, best_partial_layout.bucket_to_hand,
-               best_partial_layout.bucket_row_assignment);
+  printFinalLayout(cout, best_partial_layout.final_layout);
   for (int i = 0; i < NUM_STATS; i++) {
     cout << "==== Stats " << STATS_FNAME[i] << endl;
-    printBucketStats(best_partial_layout.stats_per_language[i]);
+    printBucketStats(best_partial_layout.stats_per_language[i],
+                     best_partial_layout.bucket_to_hand);
     cout << endl;
   }
 }
