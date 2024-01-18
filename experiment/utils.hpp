@@ -56,6 +56,55 @@ void from_json(const json& j, Stats& s) {
   j.at("trigrams").get_to(s.trigrams);
 }
 
+Stats calculateStatsFromText(filesystem::path f_name,
+                             map<char, char> const& mapper) {
+  array<char, 256> mapper_arr = {{}};
+  for (auto const [from, to] : mapper) mapper_arr[from + 128] = to;
+
+  long long total_characters = 0, total_bigrams = 0, total_skipgrams = 0,
+            total_trigrams = 0;
+  map<string, long long> characters, bigrams, skipgrams, trigrams;
+
+  ifstream in(f_name);
+  string word;
+  while (in >> word) {
+    for (size_t i = 0, j = -1; i < word.size(); ++i) {
+      word[i] = mapper_arr[word[i] + 128];
+      if (!word[i]) {
+        j = i;
+        continue;
+      }
+
+      ++total_characters;
+      ++characters[{word[i]}];
+
+      if (i - j >= 2) {
+        ++total_bigrams;
+        ++bigrams[word.substr(j + 1, 2)];
+      }
+
+      if (i - j >= 3) {
+        ++total_trigrams;
+        ++trigrams[word.substr(j + 1, 3)];
+        ++total_skipgrams;
+        ++skipgrams[{word[i - 2], word[i]}];
+      }
+    }
+  }
+
+  Stats result;
+  for (auto [s, freq] : characters)
+    result.characters[s] = (double)freq / total_characters;
+  for (auto [s, freq] : bigrams)
+    result.bigrams[s] = (double)freq / total_bigrams;
+  for (auto [s, freq] : skipgrams)
+    result.skipgrams[s] = (double)freq / total_skipgrams;
+  for (auto [s, freq] : trigrams)
+    result.trigrams[s] = (double)freq / total_trigrams;
+
+  return result;
+}
+
 Stats readStats(filesystem::path f_name) {
   ifstream f(f_name);
   json j;
