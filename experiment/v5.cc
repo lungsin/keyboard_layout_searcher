@@ -25,20 +25,34 @@ enum FingerType {
   INDEX_FINGER = 3,
 };
 
+enum HandType {
+  LEFT_HAND = 0,
+  RIGHT_HAND = 1,
+};
+
 const int NUM_STATS = 3;
 const string STATS_FNAME[NUM_STATS] = {
-    "static/oxeylyzer_stats/english.json",
-    "static/oxeylyzer_stats/450k.json",
-    "static/oxeylyzer_stats/indonesian.json",
+    // "static/stats/shai/shai.json",
+
+    // "static/oxeylyzer_stats/english.json",
+    // "static/oxeylyzer_stats/450k.json",
+    // "static/oxeylyzer_stats/indonesian.json",
+
+    "static/playground_stats/english.json",
+    "static/playground_stats/450k.json",
+    "static/playground_stats/indonesian.json",
 };
 const double STATS_WEIGHT[NUM_STATS] = {
-    4,
+    1,
     1,
     1,
 };
 
 const string RECURVA_PATH = "static/kb/recurva.kb";
+const string RECURVA_STATS_PATH = "result/recurva.txt";
+
 const string MAYA_PATH = "static/kb/maya.kb";
+const string MAYA_STATS_PATH = "result/maya.txt";
 
 constexpr int NUM_ROWS = 3;
 enum RowType { TOP_ROW = 0, MIDDLE_ROW = 1, BOTTOM_ROW = 2 };
@@ -50,7 +64,8 @@ using ThresholdPerLang = array<double, NUM_STATS>;
 using ThresholdFingerUsage = array<array<double, NUM_BUCKET>, NUM_STATS>;
 
 constexpr double AGGREGATED_THRESHOLD_SFB = 1 * PERCENT;
-constexpr ThresholdPerLang THRESHOLD_SFB_PER_LANG = {0.0090, 0.0095, 0.0100};
+constexpr ThresholdPerLang THRESHOLD_SFB_PER_LANG = {0.9 * PERCENT, 1 * PERCENT,
+                                                     1 * PERCENT};
 constexpr double AGGREGATED_THRESHOLD_SFS = 8.5 * PERCENT;
 constexpr ThresholdPerLang THRESHOLD_SFS_PER_LANG = {0.065, 0.075, 0.085};
 
@@ -101,24 +116,24 @@ constexpr bool ENABLE_SFB_PER_FINGER_THRESHOLD = true;
 constexpr ThresholdFingerUsage THRESHOLD_SFB_PER_FINGER = {{
     {0.15 * PERCENT, 1 * PERCENT, 0.10, 0.10},
     {0.1, 0.1, 0.1, 0.1},
-    {0.1, 0.1, 0.1, 0.1},
+    {0.15 * PERCENT, 0.1, 0.1, 0.1},
 }};
 
 // Trigram threshold
 constexpr ThresholdPerLang THRESHOLD_ALTERNATES_PER_LANG = {0.30, 0.30, 0.30};
 constexpr ThresholdPerLang THRESHOLD_ROLLS_PER_LANG = {0.30, 0.30, 0.30};
-constexpr ThresholdPerLang THRESHOLD_REDIRECTS_PER_LANG = {0.08, 0.15, 0.15};
+constexpr ThresholdPerLang THRESHOLD_REDIRECTS_PER_LANG = {0.08, 0.10, 0.10};
 
-constexpr double WEIGHT_SFB = 1;
-constexpr double WEIGHT_SFS = 1;
-constexpr double WEIGHT_SFB_2U = 2;
-constexpr double WEIGHT_SFS_2U = 2;
+constexpr double WEIGHT_SFB = 1 * 0;
+constexpr double WEIGHT_SFS = 1 * 0;
+constexpr double WEIGHT_SFB_2U = 1;
+constexpr double WEIGHT_SFS_2U = 1;
 
 // Scissors
-constexpr double WEIGHT_HSB = 0.1 * 0;
-constexpr double WEIGHT_HSS = 0.1 * 0;
-constexpr double WEIGHT_FSB = 1 * 0;
-constexpr double WEIGHT_FSS = 1 * 0;
+constexpr double WEIGHT_HSB = 0.05;
+constexpr double WEIGHT_HSS = 0.05;
+constexpr double WEIGHT_FSB = 1;
+constexpr double WEIGHT_FSS = 1;
 
 constexpr double WEIGHT_FINGER_USAGE_OVERALL = 0.01 * 0;
 constexpr array<double, NUM_BUCKET> WEIGHT_FINGER_USAGE = {4, 3, 2, 1};
@@ -129,6 +144,16 @@ constexpr array<double, NUM_BUCKET> WEIGHT_SFB_PER_FINGER = {4, 3, 2, 1};
 constexpr double WEIGHT_ALTERNATES = 0;
 constexpr double WEIGHT_ROLLS = 0;
 constexpr double WEIGHT_REDIRECT = 0;
+
+// Quality of life restrictions
+
+// Sometimes the result of this searcher puts the vowels at right hand.
+// Since a lot of layouts prefer to put vowels at right hand, this config is
+// here so that the letter E is at right hand.
+constexpr bool MUST_PUT_E_AT_RIGHT_HAND = true;
+
+constexpr bool MUST_PUT_SHORTCUT_KEYS_AT_LEFT_HAND = false;
+constexpr string SHORTCUT_KEYS = "zxcvws";
 
 using Bucket = vector<char>;
 // [bucket_id][bucket_cnt_id] => string
@@ -431,6 +456,8 @@ struct LayoutStats {
 
     bool const is_current_finger_middle_or_ring =
         bucket_id == MIDDLE_FINGER || bucket_id == RING_FINGER;
+    bool const is_current_finger_middle_or_ring_or_pinky =
+        is_current_finger_middle_or_ring || bucket_id == PINKY_FINGER;
     for (int other_bucket_id = 0; other_bucket_id < bucket_id;
          ++other_bucket_id) {
       bool const is_other_finger_middle_or_ring =
@@ -443,17 +470,27 @@ struct LayoutStats {
       auto const& other_middle_row = other_rows[RowType::MIDDLE_ROW];
       auto const& other_bottom_row = other_rows[RowType::BOTTOM_ROW];
 
-      // Current finger hits the lower row
+      // [Half scissors] current finger hits the lower row
       if (is_current_finger_middle_or_ring) {
         updateHalfScissors(bottom_row, other_middle_row);
         updateHalfScissors(middle_row, other_top_row);
-        updateFullScissors(bottom_row, other_top_row);
       }
 
-      // Other finger hits the lower row
+      // [Half scissors] Other finger hits the lower row
       if (is_other_finger_middle_or_ring) {
         updateHalfScissors(other_bottom_row, middle_row);
         updateHalfScissors(other_middle_row, top_row);
+      }
+
+      bool const is_other_finger_middle_or_ring_or_pinky =
+          is_other_finger_middle_or_ring || other_bucket_id == PINKY_FINGER;
+      // [Full scissors] current finger hits the lower row
+      if (is_current_finger_middle_or_ring_or_pinky) {
+        updateFullScissors(bottom_row, other_top_row);
+      }
+
+      // [Full scissors] Other finger hits the lower row
+      if (is_other_finger_middle_or_ring_or_pinky) {
         updateFullScissors(other_bottom_row, top_row);
       }
     }
@@ -467,6 +504,7 @@ struct PartialLayout {
   array<LayoutStats, NUM_STATS> stats_per_language;
 
   BucketToHand bucket_to_hand = {};
+  array<optional<int>, MAX_ASCII> letter_to_hand = {};
 
   BucketRowAssignment bucket_row_assignment = {};
 
@@ -558,6 +596,8 @@ struct PartialLayout {
   inline void assignBucketToHand(int const bucket_id, int const bucket_cnt_id,
                                  int const hand_id) {
     bucket_to_hand[bucket_id].push_back(hand_id);
+    for (char const key : buckets[bucket_id][bucket_cnt_id])
+      letter_to_hand[key] = hand_id;
     updateStatsShuffle(bucket_id, bucket_cnt_id, hand_id, 1);
   }
 
@@ -565,6 +605,8 @@ struct PartialLayout {
                                    int const hand_id) {
     updateStatsShuffle(bucket_id, bucket_cnt_id, hand_id, -1);
     bucket_to_hand[bucket_id].pop_back();
+    for (char const key : buckets[bucket_id][bucket_cnt_id])
+      letter_to_hand[key] = nullopt;
   }
 
   inline void update2UStats(int const bucket_id, int const hand_id,
@@ -831,7 +873,7 @@ inline void doneShuffle() {
   ++num_shuffle_done;
 }
 
-inline bool isShufflePrunable() {
+inline bool isPrunableShuffle() {
   ++num_iterations;
   LayoutStats const& aggregated_layout_stats = partial_layout.aggregated_stats;
 
@@ -845,6 +887,18 @@ inline bool isShufflePrunable() {
         stats.inverse_rolls > 1.0 - THRESHOLD_ROLLS_PER_LANG[i] ||
         stats.redirects > THRESHOLD_REDIRECTS_PER_LANG[i])
       return true;
+  }
+
+  if (MUST_PUT_E_AT_RIGHT_HAND) {
+    if (partial_layout.letter_to_hand['e'].value_or(-1) == HandType::LEFT_HAND)
+      return true;
+  }
+
+  if (MUST_PUT_SHORTCUT_KEYS_AT_LEFT_HAND) {
+    for (char const key : SHORTCUT_KEYS) {
+      if (partial_layout.letter_to_hand[key].value_or(-1) == RIGHT_HAND)
+        return true;
+    }
   }
 
   return false;
@@ -861,7 +915,7 @@ inline void unassignBucketToHand(int const bucket_id, int const hand_id) {
 }
 
 void shuffleBucketToHand(int bucket_id) {
-  if (isShufflePrunable()) {
+  if (isPrunableShuffle()) {
     return;
   }
 
@@ -1012,64 +1066,69 @@ void printFinalLayout(ostream& out, Layout const& layout) {
   out << endl;
 }
 
-void printBucketStats(LayoutStats const& layout_stats,
+void printBucketStats(ostream& out, LayoutStats const& layout_stats,
                       BucketToHand const& bucket_to_hand) {
-  printf("SFB: %2.3lf | SFS: %2.3lf\n", layout_stats.sfb * 100,
-         layout_stats.sfs * 100);
+  out << format("SFB: {:2.3f} | SFS: {:2.3f}\n", layout_stats.sfb * 100,
+                layout_stats.sfs * 100);
+  out << format("SFB (2U): {:2.3f} | SFS (2U): {:2.3f}\n",
+                layout_stats.sfb_2u * 100, layout_stats.sfs_2u * 100);
 
-  printf("SFB (2U): %2.3lf | SFS (2U): %2.3lf\n", layout_stats.sfb_2u * 100,
-         layout_stats.sfs_2u * 100);
+  out << format("HSB: {:2.3f} | HSS: {:2.3f}\n", layout_stats.hsb * 100,
+                layout_stats.hss * 100);
+  out << format("FSB: {:2.3f} | FSS: {:2.3f}\n", layout_stats.fsb * 100,
+                layout_stats.fss * 100);
 
-  printf("HSB: %2.3lf | HSS: %2.3lf\n", layout_stats.hsb * 100,
-         layout_stats.hss * 100);
-
-  printf("FSB: %2.3lf | FSS: %2.3lf\n", layout_stats.fsb * 100,
-         layout_stats.fss * 100);
-
-  printf("Finger Usage:\n");
+  out << format("Finger Usage:\n");
   for (int i = 0; i < NUM_BUCKET; ++i) {
-    printf("   ");
+    out << format("   ");
     for (int j = 0; j < NUM_HANDS; j++) {
       int const hand_id = bucket_to_hand[i][j];
-      printf("%2.3lf, ", layout_stats.finger_usage[i][hand_id] * 100);
+      out << format("{:2.3f}, ", layout_stats.finger_usage[i][hand_id] * 100);
     }
-    printf("\n");
+    out << format("\n");
   }
 
-  printf("SFB per bucket Usage:\n");
+  out << format("SFB per finger:\n");
   for (int i = 0; i < NUM_BUCKET; ++i) {
-    printf("   ");
+    out << format("   ");
     for (int j = 0; j < NUM_HANDS; j++) {
       int const hand_id = bucket_to_hand[i][j];
-      printf("%2.3lf, ", layout_stats.sfb_bucket[i][hand_id] * 100);
+      out << format("{:2.3f}, ", layout_stats.sfb_bucket[i][hand_id] * 100);
     }
-    printf("\n");
+    out << format("\n");
   }
 
-  printf("Total alternates: %2.3lf\n", layout_stats.alternates * 100);
+  out << format("Total alternates: {:2.3f}\n", layout_stats.alternates * 100);
 
-  printf("Total rolls: %2.3lf\n", layout_stats.rolls * 100);
+  out << format("Total rolls: {:2.3f}\n", layout_stats.rolls * 100);
 
-  printf("Total redirect: %2.3lf\n", layout_stats.redirects * 100);
+  out << format("Total redirect: {:2.3f}\n", layout_stats.redirects * 100);
 }
 
-void printBaseline(string const& kb_path) {
-  cout << "Baseline layout stats from " << kb_path << endl;
-  printFinalLayout(cout, best_partial_layout.final_layout);
-  cout << "Score: " << best_partial_layout.aggregated_stats.score << endl;
+void printBaseline(ostream& out, PartialLayout const& layout) {
+  printFinalLayout(out, layout.final_layout);
+  out << "Score: " << layout.aggregated_stats.score << endl;
   for (int i = 0; i < NUM_STATS; i++) {
-    cout << "==== Stats " << STATS_FNAME[i] << endl;
-    printBucketStats(best_partial_layout.stats_per_language[i],
-                     best_partial_layout.bucket_to_hand);
-    cout << endl;
+    out << "==== Stats " << STATS_FNAME[i] << endl;
+    printBucketStats(out, layout.stats_per_language[i], layout.bucket_to_hand);
+    out << endl;
   }
-  cout << endl;
+  out << endl;
 }
 
 void setBaseline(string const& kb_path) {
   best_partial_layout.setLayout(readKb(kb_path));
   best_partial_layout.aggregated_stats.score += 1e-9;
-  // printBaseline(kb_path);
+}
+
+void dumpBaseline(string const& out_fname, string const& kb_path,
+                  FastStats const& aggregated_stats,
+                  array<FastStats, NUM_STATS> const& stats_list) {
+  ofstream out(out_fname);
+  PartialLayout layout;
+  layout.setStats(aggregated_stats, stats_list);
+  layout.setLayout(readKb(kb_path));
+  printBaseline(out, layout);
 }
 
 int main() {
@@ -1079,6 +1138,10 @@ int main() {
   best_partial_layout.setStats(aggregated_stats, stats_list);
 
   setBaseline(RECURVA_PATH);
+  dumpBaseline(toWorkingDirectory(RECURVA_STATS_PATH), RECURVA_PATH,
+               aggregated_stats, stats_list);
+  dumpBaseline(toWorkingDirectory(MAYA_STATS_PATH), MAYA_PATH, aggregated_stats,
+               stats_list);
 
   brute(0);
 
@@ -1094,7 +1157,7 @@ int main() {
   printFinalLayout(cout, best_partial_layout.final_layout);
   for (int i = 0; i < NUM_STATS; i++) {
     cout << "==== Stats " << STATS_FNAME[i] << endl;
-    printBucketStats(best_partial_layout.stats_per_language[i],
+    printBucketStats(cout, best_partial_layout.stats_per_language[i],
                      best_partial_layout.bucket_to_hand);
     cout << endl;
   }

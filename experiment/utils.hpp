@@ -5,6 +5,13 @@
 using json = nlohmann::json;
 using namespace std;
 
+const std::filesystem::path WORKING_DIRECTORY =
+    std::getenv("BUILD_WORKING_DIRECTORY");
+
+std::string toWorkingDirectory(std::string const& relative_path) {
+  return WORKING_DIRECTORY / relative_path;
+}
+
 map<string, double> add(map<string, double> const& l,
                         map<string, double> const& r) {
   map<string, double> ans = l;
@@ -78,16 +85,19 @@ Stats calculateStatsFromText(filesystem::path f_name,
       ++total_characters;
       ++characters[{word[i]}];
 
-      if (i - j >= 2) {
+      if (i - j >= 2 && word[i] != word[i - 1]) {
         ++total_bigrams;
-        ++bigrams[word.substr(j + 1, 2)];
+        ++bigrams[{word[i - 1], word[i]}];
       }
 
       if (i - j >= 3) {
         ++total_trigrams;
-        ++trigrams[word.substr(j + 1, 3)];
-        ++total_skipgrams;
-        ++skipgrams[{word[i - 2], word[i]}];
+        ++trigrams[{word[i - 2], word[i - 1], word[i]}];
+
+        if (word[i] != word[i - 2]) {
+          ++total_skipgrams;
+          ++skipgrams[{word[i - 2], word[i]}];
+        }
       }
     }
   }

@@ -3,9 +3,12 @@ common --enable_bzlmod
 
 build --cxxopt=-std=c++20
 build --cxxopt=-Ofast
+build --action_env=CC=gcc-13
 
 run --cxxopt=-std=c++20
 run --cxxopt=-Ofast
+run --action_env=CC=gcc-13
 
 test --cxxopt=-std=c++20
 test --cxxopt=-Ofast
+test --action_env=CC=gcc-13

@@ -1,0 +1,65 @@
+==========================
+Layout:
+b l d g q  j f o u , 
+n r t s v  k h a e i 
+z x m c w  p y ' / . 
+
+Score: 0.0255959
+==== Stats static/playground_stats/english.json
+SFB: 0.958 | SFS: 6.407
+SFB (2U): 0.060 | SFS (2U): 0.681
+HSB: 2.648 | HSS: 7.875
+FSB: 0.239 | FSS: 0.765
+Finger Usage:
+   8.344, 9.211, 
+   10.346, 14.657, 
+   14.933, 15.985, 
+   14.445, 11.710, 
+SFB per finger:
+   0.012, 0.021, 
+   0.090, 0.164, 
+   0.053, 0.105, 
+   0.322, 0.191, 
+Total alternates: 41.725
+Total rolls: 44.124
+Total redirect: 3.034
+
+==== Stats static/playground_stats/450k.json
+SFB: 2.275 | SFS: 6.759
+SFB (2U): 0.084 | SFS (2U): 0.607
+HSB: 3.063 | HSS: 7.406
+FSB: 0.245 | FSS: 0.913
+Finger Usage:
+   9.358, 9.037, 
+   12.635, 14.514, 
+   12.753, 15.350, 
+   16.590, 9.758, 
+SFB per finger:
+   0.066, 0.000, 
+   0.095, 0.246, 
+   0.064, 0.128, 
+   0.605, 1.072, 
+Total alternates: 47.659
+Total rolls: 37.928
+Total redirect: 3.343
+
+==== Stats static/playground_stats/indonesian.json
+SFB: 0.885 | SFS: 5.894
+SFB (2U): 0.030 | SFS (2U): 0.374
+HSB: 2.936 | HSS: 9.641
+FSB: 0.659 | FSS: 1.344
+Finger Usage:
+   12.450, 9.764, 
+   8.159, 12.642, 
+   13.188, 21.035, 
+   9.368, 13.065, 
+SFB per finger:
+   0.014, 0.285, 
+   0.100, 0.039, 
+   0.026, 0.066, 
+   0.110, 0.244, 
+Total alternates: 46.622
+Total rolls: 40.315
+Total redirect: 7.345
+
+
