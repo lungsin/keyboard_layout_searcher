@@ -1,8 +1,8 @@
 ==========================
 Layout:
-f h l v z  w . o u y 
-s n r t d  c g a e i 
-j q , m k  p b ' ; x 
+f h l v z  . w o u y 
+s n r t d  g c a e i 
+j q , m k  b p ' ; x 
 
 ==== Stats static/playground_stats/english.json
 SFB: 0.889 | SFS: 6.419
