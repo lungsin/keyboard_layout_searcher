@@ -30,117 +30,152 @@ enum HandType {
   RIGHT_HAND = 1,
 };
 
-const int NUM_STATS = 3;
-const string STATS_FNAME[NUM_STATS] = {
-    // "static/stats/shai/shai.json",
-
-    // "static/oxeylyzer_stats/english.json",
-    // "static/oxeylyzer_stats/450k.json",
-    // "static/oxeylyzer_stats/indonesian.json",
-
-    "static/playground_stats/english.json",
-    "static/playground_stats/450k.json",
-    "static/playground_stats/indonesian.json",
-};
-const double STATS_WEIGHT[NUM_STATS] = {
-    1,
-    1,
-    1,
-};
-
-const string RECURVA_PATH = "static/kb/recurva.kb";
-const string RECURVA_STATS_PATH = "result/recurva.txt";
-
-const string MAYA_PATH = "static/kb/maya.kb";
-const string MAYA_STATS_PATH = "result/maya.txt";
-
 constexpr int NUM_ROWS = 3;
 enum RowType { TOP_ROW = 0, MIDDLE_ROW = 1, BOTTOM_ROW = 2 };
 constexpr int NUM_KEYS_PER_ROW[NUM_BUCKET] = {1, 1, 1, 2};
 
-// Thresholds and weights config
 constexpr double PERCENT = 0.01;
-using ThresholdPerLang = array<double, NUM_STATS>;
-using ThresholdFingerUsage = array<array<double, NUM_BUCKET>, NUM_STATS>;
+using ThresholdFingerUsage = array<double, NUM_BUCKET>;
 
-constexpr double AGGREGATED_THRESHOLD_SFB = 1 * PERCENT;
-constexpr ThresholdPerLang THRESHOLD_SFB_PER_LANG = {0.9 * PERCENT, 1 * PERCENT,
-                                                     1 * PERCENT};
-constexpr double AGGREGATED_THRESHOLD_SFS = 8.5 * PERCENT;
-constexpr ThresholdPerLang THRESHOLD_SFS_PER_LANG = {0.065, 0.075, 0.085};
+struct CorpusConfig {
+  // corpus info
+  string_view STATS_PATH;
 
-constexpr double AGGREGATED_THRESHOLD_SFB_2U = 0.1 * PERCENT;
-constexpr ThresholdPerLang THRESHOLD_SFB_2U_PER_LANG = {
-    0.1 * PERCENT, 0.1 * PERCENT, 0.1 * PERCENT};
-constexpr double AGGREGATED_THRESHOLD_SFS_2U = 1.5 * PERCENT;
-constexpr ThresholdPerLang THRESHOLD_SFS_2U_PER_LANG = {
-    0.5 * PERCENT, 0.5 * PERCENT, 0.5 * PERCENT};
+  // SFB & SFS threshold
+  double THRESHOLD_SFB;
+  double THRESHOLD_SFS;
+  double THRESHOLD_SFB_2U;
+  double THRESHOLD_SFS_2U;
 
-// Scissors
-constexpr bool ENABLE_SCISSORS_THRESHOLD = true;
-constexpr double AGGREGATED_THRESHOLD_HSB = 6 * PERCENT;
-constexpr ThresholdPerLang THRESHOLD_HSB_PER_LANG = {
-    5 * PERCENT,
-    5 * PERCENT,
-    6 * PERCENT,
-};
-constexpr double AGGREGATED_THRESHOLD_HSS = 12 * PERCENT;
-constexpr ThresholdPerLang THRESHOLD_HSS_PER_LANG = {
-    8 * PERCENT,
-    8 * PERCENT,
-    12 * PERCENT,
-};
+  // Scissors threshold
+  bool ENABLE_SCISSORS_THRESHOLD;
+  double THRESHOLD_HSB;
+  double THRESHOLD_HSS;
+  double THRESHOLD_FSB;
+  double THRESHOLD_FSS;
 
-constexpr double AGGREGATED_THRESHOLD_FSB = 0.6 * PERCENT;
-constexpr ThresholdPerLang THRESHOLD_FSB_PER_LANG = {
-    0.3 * PERCENT,
-    0.3 * PERCENT,
-    0.6 * PERCENT,
-};
-constexpr double AGGREGATED_THRESHOLD_FSS = 1.5 * PERCENT;
-constexpr ThresholdPerLang THRESHOLD_FSS_PER_LANG = {
-    0.3 * PERCENT,
-    0.3 * PERCENT,
-    1.5 * PERCENT,
+  // Finger-wise threshold
+  bool ENABLE_FINGER_THRESHOLD;
+  ThresholdFingerUsage THRESHOLD_FINGER_USAGE;
+
+  bool ENABLE_SFB_PER_FINGER_THRESHOLD;
+  ThresholdFingerUsage THRESHOLD_SFB_PER_FINGER;
+
+  // Trigram threshold
+  double THRESHOLD_ALTERNATES;
+  double THRESHOLD_ROLLS;
+  double THRESHOLD_REDIRECTS;
 };
 
-// Finger-wise threshold
-constexpr bool ENABLE_FINGER_THRESHOLD = true;
-constexpr ThresholdFingerUsage THRESHOLD_FINGER_USAGE = {{
-    {0.12, 0.16, 0.25, 0.30},
-    {0.14, 0.16, 0.25, 0.30},
-    {0.14, 0.22, 0.25, 0.30},
-}};
+constexpr CorpusConfig LANG_ENGLISH = {
+    .STATS_PATH = "static/playground_stats/english.json",
+    // .STATS_PATH = "static/oxeylyzer_stats/english.json",
+    .THRESHOLD_SFB = 0.9 * PERCENT,
+    .THRESHOLD_SFS = 6.5 * PERCENT,
+    .THRESHOLD_SFB_2U = 0.1 * PERCENT,
+    .THRESHOLD_SFS_2U = 0.5 * PERCENT,
+    .ENABLE_SCISSORS_THRESHOLD = true,
+    .THRESHOLD_HSB = 5 * PERCENT,
+    .THRESHOLD_HSS = 8 * PERCENT,
+    .THRESHOLD_FSB = 0.3 * PERCENT,
+    .THRESHOLD_FSS = 0.3 * PERCENT,
+    .ENABLE_FINGER_THRESHOLD = true,
+    .THRESHOLD_FINGER_USAGE = {{0.12, 0.16, 0.25, 0.30}},
+    .ENABLE_SFB_PER_FINGER_THRESHOLD = true,
+    .THRESHOLD_SFB_PER_FINGER = {{0.15 * PERCENT, 0.2 * PERCENT, 0.1, 0.1}},
+    .THRESHOLD_ALTERNATES = 0.30,
+    .THRESHOLD_ROLLS = 0.30,
+    .THRESHOLD_REDIRECTS = 8 * PERCENT,
+};
 
-constexpr bool ENABLE_SFB_PER_FINGER_THRESHOLD = true;
-constexpr ThresholdFingerUsage THRESHOLD_SFB_PER_FINGER = {{
-    {0.15 * PERCENT, 1 * PERCENT, 0.10, 0.10},
-    {0.1, 0.1, 0.1, 0.1},
-    {0.15 * PERCENT, 0.1, 0.1, 0.1},
-}};
+constexpr CorpusConfig LANG_450K = {
+    .STATS_PATH = "static/playground_stats/450k.json",
+    // .STATS_PATH = "static/oxeylyzer_stats/450k.json",
+    .THRESHOLD_SFB = 1 * PERCENT,
+    .THRESHOLD_SFS = 7.5 * PERCENT,
+    .THRESHOLD_SFB_2U = 0.1 * PERCENT,
+    .THRESHOLD_SFS_2U = 0.5 * PERCENT,
+    .ENABLE_SCISSORS_THRESHOLD = true,
+    .THRESHOLD_HSB = 5 * PERCENT,
+    .THRESHOLD_HSS = 8 * PERCENT,
+    .THRESHOLD_FSB = 0.3 * PERCENT,
+    .THRESHOLD_FSS = 0.3 * PERCENT,
+    .ENABLE_FINGER_THRESHOLD = true,
+    .THRESHOLD_FINGER_USAGE = {{0.14, 0.16, 0.25, 0.30}},
+    .ENABLE_SFB_PER_FINGER_THRESHOLD = false,
+    .THRESHOLD_SFB_PER_FINGER = {{0.1, 0.1, 0.1, 0.1}},
+    .THRESHOLD_ALTERNATES = 0.30,
+    .THRESHOLD_ROLLS = 0.30,
+    .THRESHOLD_REDIRECTS = 10 * PERCENT,
+};
 
-// Trigram threshold
-constexpr ThresholdPerLang THRESHOLD_ALTERNATES_PER_LANG = {0.30, 0.30, 0.30};
-constexpr ThresholdPerLang THRESHOLD_ROLLS_PER_LANG = {0.30, 0.30, 0.30};
-constexpr ThresholdPerLang THRESHOLD_REDIRECTS_PER_LANG = {0.08, 0.10, 0.10};
+constexpr CorpusConfig LANG_INDONESIAN = {
+    .STATS_PATH = "static/playground_stats/indonesian.json",
+    // .STATS_PATH = "static/oxeylyzer_stats/indonesian.json",
+    .THRESHOLD_SFB = 1 * PERCENT,
+    .THRESHOLD_SFS = 8.5 * PERCENT,
+    .THRESHOLD_SFB_2U = 0.1 * PERCENT,
+    .THRESHOLD_SFS_2U = 0.5 * PERCENT,
+    .ENABLE_SCISSORS_THRESHOLD = true,
+    .THRESHOLD_HSB = 6 * PERCENT,
+    .THRESHOLD_HSS = 12 * PERCENT,
+    .THRESHOLD_FSB = 0.6 * PERCENT,
+    .THRESHOLD_FSS = 1.5 * PERCENT,
+    .ENABLE_FINGER_THRESHOLD = true,
+    .THRESHOLD_FINGER_USAGE = {{0.14, 0.22, 0.25, 0.30}},
+    .ENABLE_SFB_PER_FINGER_THRESHOLD = true,
+    .THRESHOLD_SFB_PER_FINGER = {{0.15 * PERCENT, 0.1, 0.1, 0.1}},
+    .THRESHOLD_ALTERNATES = 0.30,
+    .THRESHOLD_ROLLS = 0.30,
+    .THRESHOLD_REDIRECTS = 10 * PERCENT,
+};
 
+constexpr array ALL_CORPUS_CONFIG = {
+    array{LANG_ENGLISH, LANG_450K, LANG_INDONESIAN}};
+
+struct WeightedCorpusConfig {
+  double weight;
+  CorpusConfig config;
+};
+
+constexpr array WEIGHTED_CORPUS_CONFIG_LIST = array{
+    WeightedCorpusConfig{1, LANG_ENGLISH},
+    WeightedCorpusConfig{1, LANG_450K},
+    WeightedCorpusConfig{1, LANG_INDONESIAN},
+};
+constexpr int NUM_STATS = WEIGHTED_CORPUS_CONFIG_LIST.size();
+
+constexpr auto getLangThresholdConfigList(
+    array<WeightedCorpusConfig, NUM_STATS> const& weighted_lang_list) {
+  array<CorpusConfig, NUM_STATS> result;
+  for (int i = 0; i < NUM_STATS; ++i) result[i] = weighted_lang_list[i].config;
+  return result;
+}
+
+constexpr auto CORPUS_CONFIG_LIST =
+    getLangThresholdConfigList(WEIGHTED_CORPUS_CONFIG_LIST);
+
+// Weights config
+// SFB & SFS weight
 constexpr double WEIGHT_SFB = 1 * 0;
 constexpr double WEIGHT_SFS = 1 * 0;
 constexpr double WEIGHT_SFB_2U = 1;
 constexpr double WEIGHT_SFS_2U = 1;
 
-// Scissors
+// Scissors weight
 constexpr double WEIGHT_HSB = 0.05;
 constexpr double WEIGHT_HSS = 0.05;
 constexpr double WEIGHT_FSB = 1;
 constexpr double WEIGHT_FSS = 1;
 
+// Finger-wise weight
 constexpr double WEIGHT_FINGER_USAGE_OVERALL = 0.01 * 0;
 constexpr array<double, NUM_BUCKET> WEIGHT_FINGER_USAGE = {4, 3, 2, 1};
 
 constexpr double WEIGHT_SFB_PER_FINGER_OVERALL = 1 * 0;
 constexpr array<double, NUM_BUCKET> WEIGHT_SFB_PER_FINGER = {4, 3, 2, 1};
 
+// Trigram weight
 constexpr double WEIGHT_ALTERNATES = 0;
 constexpr double WEIGHT_ROLLS = 0;
 constexpr double WEIGHT_REDIRECT = 0;
@@ -154,6 +189,13 @@ constexpr bool MUST_PUT_E_AT_RIGHT_HAND = true;
 
 constexpr bool MUST_PUT_SHORTCUT_KEYS_AT_LEFT_HAND = false;
 constexpr string SHORTCUT_KEYS = "zxcvws";
+// ====
+
+const string RECURVA_PATH = "static/kb/recurva.kb";
+const string RECURVA_STATS_PATH = "result/recurva.txt";
+
+const string MAYA_PATH = "static/kb/maya.kb";
+const string MAYA_STATS_PATH = "result/maya.txt";
 
 using Bucket = vector<char>;
 // [bucket_id][bucket_cnt_id] => string
@@ -204,17 +246,18 @@ Buckets readKb(filesystem::path path) {
 
 pair<FastStats, array<FastStats, NUM_STATS>> readAllStats() {
   cerr << "Reading all stats" << endl;
-  Stats ans;
-  double total = 0;
+  Stats aggregate;
+  double total_weight = 0;
   array<FastStats, NUM_STATS> stats_list;
   for (int i = 0; i < NUM_STATS; i++) {
-    cerr << "  Loading stats file: " << STATS_FNAME[i] << endl;
-    Stats cur = readStats(STATS_FNAME[i]);
+    auto const& [weight, config] = WEIGHTED_CORPUS_CONFIG_LIST[i];
+    cerr << "  Loading stats file: " << config.STATS_PATH << endl;
+    Stats cur = readStats(config.STATS_PATH);
     stats_list[i] = cur;
-    ans = ans + cur * STATS_WEIGHT[i];
-    total += STATS_WEIGHT[i];
+    aggregate = aggregate + cur * weight;
+    total_weight += weight;
   }
-  return {FastStats(ans / total), stats_list};
+  return {FastStats(aggregate / total_weight), stats_list};
 }
 
 inline double fingerUsageScore(double const one_finger_usage,
@@ -681,8 +724,10 @@ inline void doneBruteScissors() {
   best_partial_layout = partial_layout;
 
   if (num_brute_scissors_done % 10 == 0) {
-    cerr << "Found new layout. Iter: " << num_brute_scissors_done
-         << ",Score: " << best_partial_layout.aggregated_stats.score << endl;
+    cerr << format("Found new layout. Iter: {}, Score: {}",
+                   num_brute_scissors_done,
+                   best_partial_layout.aggregated_stats.score)
+         << endl;
   }
   ++num_brute_scissors_done;
 }
@@ -696,21 +741,16 @@ inline bool isPruneableBruteScissors() {
     return true;
 
   // Scissors
-  if (ENABLE_SCISSORS_THRESHOLD) {
-    if (aggregated_layout_stats.hsb > AGGREGATED_THRESHOLD_HSB ||
-        aggregated_layout_stats.hss > AGGREGATED_THRESHOLD_HSS ||
-        aggregated_layout_stats.fsb > AGGREGATED_THRESHOLD_FSB ||
-        aggregated_layout_stats.fss > AGGREGATED_THRESHOLD_FSS)
-      return true;
+  for (int i = 0; i < NUM_STATS; ++i) {
+    auto const& LANG_CONFIG = CORPUS_CONFIG_LIST[i];
+    if (!LANG_CONFIG.ENABLE_SCISSORS_THRESHOLD) continue;
 
-    for (int i = 0; i < NUM_STATS; ++i) {
-      auto const& stats = partial_layout.stats_per_language[i];
-      if (stats.hsb > THRESHOLD_HSB_PER_LANG[i] ||
-          stats.hss > THRESHOLD_HSS_PER_LANG[i] ||
-          stats.fsb > THRESHOLD_FSB_PER_LANG[i] ||
-          stats.fss > THRESHOLD_FSS_PER_LANG[i])
-        return true;
-    }
+    auto const& stats = partial_layout.stats_per_language[i];
+    if (stats.hsb > LANG_CONFIG.THRESHOLD_HSB ||
+        stats.hss > LANG_CONFIG.THRESHOLD_HSS ||
+        stats.fsb > LANG_CONFIG.THRESHOLD_FSB ||
+        stats.fss > LANG_CONFIG.THRESHOLD_FSS)
+      return true;
   }
 
   return false;
@@ -758,14 +798,12 @@ inline bool isPrunableBruteRowPermutFor2U() {
     return true;
 
   // SFB & SFS 2U
-  if (aggregated_layout_stats.sfb_2u > AGGREGATED_THRESHOLD_SFB_2U ||
-      aggregated_layout_stats.sfs_2u > AGGREGATED_THRESHOLD_SFS_2U)
-    return true;
 
   for (int i = 0; i < NUM_STATS; ++i) {
+    auto const& LANG_CONFIG = CORPUS_CONFIG_LIST[i];
     auto const& stats = partial_layout.stats_per_language[i];
-    if (stats.sfb_2u > THRESHOLD_SFB_2U_PER_LANG[i] ||
-        stats.sfs_2u > THRESHOLD_SFS_2U_PER_LANG[i])
+    if (stats.sfb_2u > LANG_CONFIG.THRESHOLD_SFB_2U ||
+        stats.sfs_2u > LANG_CONFIG.THRESHOLD_SFS_2U)
       return true;
   }
 
@@ -882,10 +920,11 @@ inline bool isPrunableShuffle() {
     return true;
 
   for (int i = 0; i < NUM_STATS; ++i) {
+    auto const& LANG_CONFIG = CORPUS_CONFIG_LIST[i];
     auto const& stats = partial_layout.stats_per_language[i];
-    if (stats.inverse_alternates > 1.0 - THRESHOLD_ALTERNATES_PER_LANG[i] ||
-        stats.inverse_rolls > 1.0 - THRESHOLD_ROLLS_PER_LANG[i] ||
-        stats.redirects > THRESHOLD_REDIRECTS_PER_LANG[i])
+    if (stats.inverse_alternates > 1.0 - LANG_CONFIG.THRESHOLD_ALTERNATES ||
+        stats.inverse_rolls > 1.0 - LANG_CONFIG.THRESHOLD_ROLLS ||
+        stats.redirects > LANG_CONFIG.THRESHOLD_REDIRECTS)
       return true;
   }
 
@@ -944,39 +983,39 @@ inline void done() {
 inline bool isPrunable() {
   ++num_iterations;
   LayoutStats const& aggregated_layout_stats = partial_layout.aggregated_stats;
-  if (aggregated_layout_stats.sfb > AGGREGATED_THRESHOLD_SFB ||
-      aggregated_layout_stats.sfs > AGGREGATED_THRESHOLD_SFS)
-    return true;
 
   if (aggregated_layout_stats.score >
       best_partial_layout.aggregated_stats.score)
     return true;
 
   for (int i = 0; i < NUM_STATS; ++i) {
+    auto const& LANG_CONFIG = CORPUS_CONFIG_LIST[i];
     auto const& stats = partial_layout.stats_per_language[i];
-    if (stats.sfb > THRESHOLD_SFB_PER_LANG[i] ||
-        stats.sfs > THRESHOLD_SFS_PER_LANG[i])
+    if (stats.sfb > LANG_CONFIG.THRESHOLD_SFB ||
+        stats.sfs > LANG_CONFIG.THRESHOLD_SFS)
       return true;
   }
 
-  if (ENABLE_FINGER_THRESHOLD) {
-    for (int stats_i = 0; stats_i < NUM_STATS; ++stats_i) {
-      auto const& stats = partial_layout.stats_per_language[stats_i];
-      for (int i = 0; i < NUM_BUCKET; ++i)
-        for (size_t j = 0; j < partial_layout.buckets[i].size(); ++j)
-          if (stats.finger_usage[i][j] > THRESHOLD_FINGER_USAGE[stats_i][i])
-            return true;
-    }
+  for (int stats_i = 0; stats_i < NUM_STATS; ++stats_i) {
+    auto const& LANG_CONFIG = CORPUS_CONFIG_LIST[stats_i];
+    if (!LANG_CONFIG.ENABLE_FINGER_THRESHOLD) continue;
+
+    auto const& stats = partial_layout.stats_per_language[stats_i];
+    for (int i = 0; i < NUM_BUCKET; ++i)
+      for (size_t j = 0; j < partial_layout.buckets[i].size(); ++j)
+        if (stats.finger_usage[i][j] > LANG_CONFIG.THRESHOLD_FINGER_USAGE[i])
+          return true;
   }
 
-  if (ENABLE_SFB_PER_FINGER_THRESHOLD) {
-    for (int stats_i = 0; stats_i < NUM_STATS; ++stats_i) {
-      auto const& stats = partial_layout.stats_per_language[stats_i];
-      for (int i = 0; i < NUM_BUCKET; ++i)
-        for (size_t j = 0; j < partial_layout.buckets[i].size(); ++j)
-          if (stats.sfb_bucket[i][j] > THRESHOLD_SFB_PER_FINGER[stats_i][i])
-            return true;
-    }
+  for (int stats_i = 0; stats_i < NUM_STATS; ++stats_i) {
+    auto const& LANG_CONFIG = CORPUS_CONFIG_LIST[stats_i];
+    if (!LANG_CONFIG.ENABLE_SFB_PER_FINGER_THRESHOLD) continue;
+
+    auto const& stats = partial_layout.stats_per_language[stats_i];
+    for (int i = 0; i < NUM_BUCKET; ++i)
+      for (size_t j = 0; j < partial_layout.buckets[i].size(); ++j)
+        if (stats.sfb_bucket[i][j] > LANG_CONFIG.THRESHOLD_SFB_PER_FINGER[i])
+          return true;
   }
 
   return false;
@@ -1068,14 +1107,14 @@ void printFinalLayout(ostream& out, Layout const& layout) {
 
 void printBucketStats(ostream& out, LayoutStats const& layout_stats,
                       BucketToHand const& bucket_to_hand) {
-  out << format("SFB: {:2.3f} | SFS: {:2.3f}\n", layout_stats.sfb * 100,
+  out << format("SFB: {:6.3f} | SFS: {:6.3f}\n", layout_stats.sfb * 100,
                 layout_stats.sfs * 100);
-  out << format("SFB (2U): {:2.3f} | SFS (2U): {:2.3f}\n",
+  out << format("SFB (2U): {:6.3f} | SFS (2U): {:6.3f}\n",
                 layout_stats.sfb_2u * 100, layout_stats.sfs_2u * 100);
 
-  out << format("HSB: {:2.3f} | HSS: {:2.3f}\n", layout_stats.hsb * 100,
+  out << format("HSB: {:6.3f} | HSS: {:6.3f}\n", layout_stats.hsb * 100,
                 layout_stats.hss * 100);
-  out << format("FSB: {:2.3f} | FSS: {:2.3f}\n", layout_stats.fsb * 100,
+  out << format("FSB: {:6.3f} | FSS: {:6.3f}\n", layout_stats.fsb * 100,
                 layout_stats.fss * 100);
 
   out << format("Finger Usage:\n");
@@ -1083,7 +1122,7 @@ void printBucketStats(ostream& out, LayoutStats const& layout_stats,
     out << format("   ");
     for (int j = 0; j < NUM_HANDS; j++) {
       int const hand_id = bucket_to_hand[i][j];
-      out << format("{:2.3f}, ", layout_stats.finger_usage[i][hand_id] * 100);
+      out << format("{:6.3f}, ", layout_stats.finger_usage[i][hand_id] * 100);
     }
     out << format("\n");
   }
@@ -1093,23 +1132,23 @@ void printBucketStats(ostream& out, LayoutStats const& layout_stats,
     out << format("   ");
     for (int j = 0; j < NUM_HANDS; j++) {
       int const hand_id = bucket_to_hand[i][j];
-      out << format("{:2.3f}, ", layout_stats.sfb_bucket[i][hand_id] * 100);
+      out << format("{:6.3f}, ", layout_stats.sfb_bucket[i][hand_id] * 100);
     }
     out << format("\n");
   }
 
-  out << format("Total alternates: {:2.3f}\n", layout_stats.alternates * 100);
+  out << format("Total alternates: {:6.3f}\n", layout_stats.alternates * 100);
 
-  out << format("Total rolls: {:2.3f}\n", layout_stats.rolls * 100);
+  out << format("Total rolls: {:6.3f}\n", layout_stats.rolls * 100);
 
-  out << format("Total redirect: {:2.3f}\n", layout_stats.redirects * 100);
+  out << format("Total redirect: {:6.3f}\n", layout_stats.redirects * 100);
 }
 
-void printBaseline(ostream& out, PartialLayout const& layout) {
+void printLayoutWithStats(ostream& out, PartialLayout const& layout) {
   printFinalLayout(out, layout.final_layout);
   out << "Score: " << layout.aggregated_stats.score << endl;
   for (int i = 0; i < NUM_STATS; i++) {
-    out << "==== Stats " << STATS_FNAME[i] << endl;
+    out << "==== Stats " << CORPUS_CONFIG_LIST[i].STATS_PATH << endl;
     printBucketStats(out, layout.stats_per_language[i], layout.bucket_to_hand);
     out << endl;
   }
@@ -1128,7 +1167,7 @@ void dumpBaseline(string const& out_fname, string const& kb_path,
   PartialLayout layout;
   layout.setStats(aggregated_stats, stats_list);
   layout.setLayout(readKb(kb_path));
-  printBaseline(out, layout);
+  printLayoutWithStats(out, layout);
 }
 
 int main() {
@@ -1154,11 +1193,5 @@ int main() {
 
   if (num_shuffle_done == 0) return 0;
 
-  printFinalLayout(cout, best_partial_layout.final_layout);
-  for (int i = 0; i < NUM_STATS; i++) {
-    cout << "==== Stats " << STATS_FNAME[i] << endl;
-    printBucketStats(cout, best_partial_layout.stats_per_language[i],
-                     best_partial_layout.bucket_to_hand);
-    cout << endl;
-  }
+  printLayoutWithStats(cout, best_partial_layout);
 }
