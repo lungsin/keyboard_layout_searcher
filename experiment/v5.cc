@@ -61,6 +61,9 @@ struct CorpusConfig {
   bool ENABLE_SFB_PER_FINGER_THRESHOLD;
   ThresholdFingerUsage THRESHOLD_SFB_PER_FINGER;
 
+  bool ENABLE_SFS_2U_PER_FINGER_THRESHOLD;
+  ThresholdFingerUsage THRESHOLD_SFS_2U_PER_FINGER;
+
   // Trigram threshold
   double THRESHOLD_ALTERNATES;
   double THRESHOLD_ROLLS;
@@ -71,20 +74,23 @@ constexpr CorpusConfig LANG_SHAI = {
     .STATS_PATH = "static/stats/shai/shai.json",
     .THRESHOLD_SFB = 1 * PERCENT,
     .THRESHOLD_SFS = 6.5 * PERCENT,
-    .THRESHOLD_SFB_2U = 0.2 * PERCENT,
-    .THRESHOLD_SFS_2U = 0.6 * PERCENT,
+    .THRESHOLD_SFB_2U = 0.1 * PERCENT,
+    .THRESHOLD_SFS_2U = 0.5 * PERCENT,
     .ENABLE_SCISSORS_THRESHOLD = true,
     .THRESHOLD_HSB = 5 * PERCENT,
     .THRESHOLD_HSS = 8 * PERCENT,
     .THRESHOLD_FSB = 1 * PERCENT,
     .THRESHOLD_FSS = 1 * PERCENT,
     .ENABLE_FINGER_THRESHOLD = true,
-    .THRESHOLD_FINGER_USAGE = {{0.12, 0.17, 0.25, 0.30}},
+    .THRESHOLD_FINGER_USAGE = {{0.12, 0.161, 0.25, 0.30}},
     .ENABLE_SFB_PER_FINGER_THRESHOLD = true,
-    .THRESHOLD_SFB_PER_FINGER = {{0.16 * PERCENT, 0.2 * PERCENT, 0.1, 0.1}},
-    .THRESHOLD_ALTERNATES = 0.25,
-    .THRESHOLD_ROLLS = 0.25,
-    .THRESHOLD_REDIRECTS = 8 * PERCENT,
+    .THRESHOLD_SFB_PER_FINGER = {{0.16 * PERCENT, 0.25 * PERCENT, 0.3 * PERCENT,
+                                  0.1}},
+    .ENABLE_SFS_2U_PER_FINGER_THRESHOLD = true,
+    .THRESHOLD_SFS_2U_PER_FINGER = {{0.1 * PERCENT, 0.1 * PERCENT, 0.1, 0.1}},
+    .THRESHOLD_ALTERNATES = 0.30,
+    .THRESHOLD_ROLLS = 0.30,
+    .THRESHOLD_REDIRECTS = 6 * PERCENT,
 };
 
 constexpr CorpusConfig LANG_ENGLISH = {
@@ -92,8 +98,8 @@ constexpr CorpusConfig LANG_ENGLISH = {
     // .STATS_PATH = "static/oxeylyzer_stats/english.json",
     .THRESHOLD_SFB = 1 * PERCENT,
     .THRESHOLD_SFS = 6.5 * PERCENT,
-    .THRESHOLD_SFB_2U = 0.2 * PERCENT,
-    .THRESHOLD_SFS_2U = 0.6 * PERCENT,
+    .THRESHOLD_SFB_2U = 0.1 * PERCENT,
+    .THRESHOLD_SFS_2U = 0.5 * PERCENT,
     .ENABLE_SCISSORS_THRESHOLD = true,
     .THRESHOLD_HSB = 5 * PERCENT,
     .THRESHOLD_HSS = 8 * PERCENT,
@@ -102,10 +108,13 @@ constexpr CorpusConfig LANG_ENGLISH = {
     .ENABLE_FINGER_THRESHOLD = true,
     .THRESHOLD_FINGER_USAGE = {{0.12, 0.16, 0.25, 0.30}},
     .ENABLE_SFB_PER_FINGER_THRESHOLD = true,
-    .THRESHOLD_SFB_PER_FINGER = {{0.15 * PERCENT, 0.2 * PERCENT, 0.1, 0.1}},
-    .THRESHOLD_ALTERNATES = 0.25,
-    .THRESHOLD_ROLLS = 0.25,
-    .THRESHOLD_REDIRECTS = 8 * PERCENT,
+    .THRESHOLD_SFB_PER_FINGER = {{0.15 * PERCENT, 0.25 * PERCENT, 0.3 * PERCENT,
+                                  0.1}},
+    .ENABLE_SFS_2U_PER_FINGER_THRESHOLD = true,
+    .THRESHOLD_SFS_2U_PER_FINGER = {{0.1 * PERCENT, 0.1 * PERCENT, 0.1, 0.1}},
+    .THRESHOLD_ALTERNATES = 0.30,
+    .THRESHOLD_ROLLS = 0.30,
+    .THRESHOLD_REDIRECTS = 6 * PERCENT,
 };
 
 constexpr CorpusConfig LANG_450K = {
@@ -124,9 +133,11 @@ constexpr CorpusConfig LANG_450K = {
     .THRESHOLD_FINGER_USAGE = {{0.14, 0.16, 0.25, 0.30}},
     .ENABLE_SFB_PER_FINGER_THRESHOLD = false,
     .THRESHOLD_SFB_PER_FINGER = {{0.1, 0.1, 0.1, 0.1}},
-    .THRESHOLD_ALTERNATES = 0.10,
-    .THRESHOLD_ROLLS = 0.10,
-    .THRESHOLD_REDIRECTS = 20 * PERCENT,
+    .ENABLE_SFS_2U_PER_FINGER_THRESHOLD = false,
+    .THRESHOLD_SFS_2U_PER_FINGER = {{0.1, 0.1, 0.1, 0.1}},
+    .THRESHOLD_ALTERNATES = 0.30,
+    .THRESHOLD_ROLLS = 0.30,
+    .THRESHOLD_REDIRECTS = 10 * PERCENT,
 };
 
 constexpr CorpusConfig LANG_INDONESIAN = {
@@ -134,7 +145,7 @@ constexpr CorpusConfig LANG_INDONESIAN = {
     .STATS_PATH = "static/oxeylyzer_stats/indonesian.json",
     .THRESHOLD_SFB = 1 * PERCENT,
     .THRESHOLD_SFS = 8.5 * PERCENT,
-    .THRESHOLD_SFB_2U = 0.2 * PERCENT,
+    .THRESHOLD_SFB_2U = 0.1 * PERCENT,
     .THRESHOLD_SFS_2U = 0.5 * PERCENT,
     .ENABLE_SCISSORS_THRESHOLD = true,
     .THRESHOLD_HSB = 6 * PERCENT,
@@ -145,9 +156,11 @@ constexpr CorpusConfig LANG_INDONESIAN = {
     .THRESHOLD_FINGER_USAGE = {{0.14, 0.22, 0.25, 0.30}},
     .ENABLE_SFB_PER_FINGER_THRESHOLD = true,
     .THRESHOLD_SFB_PER_FINGER = {{0.15 * PERCENT, 0.1, 0.1, 0.1}},
-    .THRESHOLD_ALTERNATES = 0.25,
-    .THRESHOLD_ROLLS = 0.25,
-    .THRESHOLD_REDIRECTS = 15 * PERCENT,
+    .ENABLE_SFS_2U_PER_FINGER_THRESHOLD = true,
+    .THRESHOLD_SFS_2U_PER_FINGER = {{0.1 * PERCENT, 0.1 * PERCENT, 0.1, 0.1}},
+    .THRESHOLD_ALTERNATES = 0.30,
+    .THRESHOLD_ROLLS = 0.30,
+    .THRESHOLD_REDIRECTS = 11 * PERCENT,
 };
 
 struct WeightedCorpusConfig {
@@ -196,7 +209,7 @@ constexpr array<double, NUM_BUCKET> WEIGHT_SFB_PER_FINGER = {4, 3, 2, 1};
 // Trigram weight
 constexpr double WEIGHT_ALTERNATES = 0;
 constexpr double WEIGHT_ROLLS = 0;
-constexpr double WEIGHT_REDIRECT = 0;
+constexpr double WEIGHT_REDIRECT = 1e-5;
 
 // Quality of life restrictions
 
@@ -205,7 +218,7 @@ constexpr double WEIGHT_REDIRECT = 0;
 // here so that the letter E is at right hand.
 constexpr bool MUST_PUT_E_AT_RIGHT_HAND = true;
 
-constexpr bool MUST_PUT_SHORTCUT_KEYS_AT_LEFT_HAND = false;
+constexpr bool MUST_PUT_SHORTCUT_KEYS_AT_LEFT_HAND = true;
 constexpr string SHORTCUT_KEYS = "xcv";
 // ====
 
@@ -220,6 +233,8 @@ const array BASELINE_LIST = array{
     BaselinePath{"static/kb/colemak_dh.kb", "result/colemak_dh.txt"},
     BaselinePath{"static/kb/qwerty.kb", "result/qwerty.txt"},
     BaselinePath{"static/kb/klungsmak.kb", "result/klungsmak.txt"},
+    BaselinePath{"static/kb/klungsmak.xcv.kb", "result/klungsmak.xcv.txt"},
+    BaselinePath{"static/kb/klungsmak.xcvz.kb", "result/klungsmak.xcvz.txt"},
     BaselinePath{"static/kb/variant.kb", "result/variant.txt"},
 };
 
@@ -318,6 +333,9 @@ struct LayoutStats {
                                               finger_usage = {{}};
 
   double sfb_2u = 0, sfs_2u = 0;
+
+  array<array<double, NUM_HANDS>, NUM_BUCKET> sfb_2u_finger = {{}},
+                                              sfs_2u_finger = {{}};
 
   // Half & full scisors stats
   double hsb = 0, fsb = 0;
@@ -484,6 +502,9 @@ struct LayoutStats {
         sfb_2u += delta_sfb_2u;
         sfs_2u += delta_sfs_2u;
 
+        sfb_2u_finger[bucket_id][hand_id] += delta_sfb_2u;
+        sfs_2u_finger[bucket_id][hand_id] += delta_sfs_2u;
+
         score += delta_sfb_2u * WEIGHT_SFB_2U;
         score += delta_sfs_2u * WEIGHT_SFS_2U;
       }
@@ -602,7 +623,7 @@ struct PartialLayout {
       for (int bucket_cnt_id = 0; bucket_cnt_id < NUM_HANDS; ++bucket_cnt_id) {
         auto const& bucket = layout[bucket_id][bucket_cnt_id];
         pushBucket(bucket_id, *bucket.begin());
-        for (int i = 1; i < bucket.size(); ++i) {
+        for (size_t i = 1; i < bucket.size(); ++i) {
           pushKey(bucket_id, bucket_cnt_id, bucket[i]);
         }
       }
@@ -702,7 +723,7 @@ struct PartialLayout {
     for (int i = 0; i < NUM_ROWS; ++i) finger_stack[i].clear();
 
     int const num_keys_per_row = NUM_KEYS_PER_ROW[bucket_id];
-    for (int i = 0; i < bucket.size(); ++i) {
+    for (size_t i = 0; i < bucket.size(); ++i) {
       finger_stack[i / num_keys_per_row].push_back(bucket[keys_permut[i]]);
     }
     update2UStats(bucket_id, hand_id, 1);
@@ -843,6 +864,20 @@ inline bool isPrunableBruteRowPermutFor2U() {
       return true;
   }
 
+  // SFS 2U per finger
+  for (int i = 0; i < NUM_STATS; ++i) {
+    if (WEIGHTED_CORPUS_CONFIG_LIST[i].weight == 0) continue;
+    auto const& LANG_CONFIG = CORPUS_CONFIG_LIST[i];
+    if (!LANG_CONFIG.ENABLE_SFS_2U_PER_FINGER_THRESHOLD) continue;
+
+    auto const& stats = partial_layout.stats_per_language[i];
+    for (int j = 0; j < NUM_BUCKET; ++j)
+      for (int k = 0; k < NUM_HANDS; ++k)
+        if (stats.sfs_2u_finger[j][k] >
+            LANG_CONFIG.THRESHOLD_SFS_2U_PER_FINGER[j])
+          return true;
+  }
+
   return false;
 }
 
@@ -857,8 +892,8 @@ constexpr array<array<int, num_keys>, num_results> getRowPermutFor2U() {
   auto isPermut = [](array<int, num_keys> const& arr) {
     array<int, num_keys> arr2 = arr;
     sort(arr2.begin(), arr2.end());
-    for (int i = 0; i < arr2.size(); ++i)
-      if (arr2[i] != i) return false;
+    for (size_t i = 0; i < arr2.size(); ++i)
+      if (arr2[i] != (size_t)i) return false;
     return true;
   };
 
@@ -1111,7 +1146,7 @@ void brute(int key_id) {
   // new buckets
   for (int i = 0; i < NUM_BUCKET; i++) {
     if (partial_layout.buckets[i].size() == NUM_HANDS) continue;
-    printProgressAddBucket(i, key);
+    // printProgressAddBucket(i, key);
     pushBucket(i, key);
     brute(key_id + 1);
     popBucket(i, key);
@@ -1119,8 +1154,9 @@ void brute(int key_id) {
 
   for (int i = 0; i < NUM_BUCKET; i++) {
     for (size_t j = 0; j < partial_layout.buckets[i].size(); j++) {
-      if (partial_layout.buckets[i][j].size() == BUCKET_CAP[i]) continue;
-      printProgressAddKey(i, j, key);
+      if (partial_layout.buckets[i][j].size() == (size_t)BUCKET_CAP[i])
+        continue;
+      // printProgressAddKey(i, j, key);
       pushKey(i, j, key);
       brute(key_id + 1);
       popKey(i, j, key);
@@ -1173,6 +1209,24 @@ void printBucketStats(ostream& out, LayoutStats const& layout_stats,
     for (int j = 0; j < NUM_HANDS; j++) {
       int const hand_id = bucket_to_hand[i][j];
       out << format("{:6.3f}, ", layout_stats.sfb_bucket[i][hand_id] * 100);
+    }
+    out << format("\n");
+  }
+
+  out << format("SFB (2U) per finger:\n");
+  for (int i = 0; i < NUM_BUCKET; ++i) {
+    out << format("   ");
+    for (int j = 0; j < NUM_HANDS; j++) {
+      out << format("{:6.3f}, ", layout_stats.sfb_2u_finger[i][j] * 100);
+    }
+    out << format("\n");
+  }
+
+  out << format("SFS (2U) per finger:\n");
+  for (int i = 0; i < NUM_BUCKET; ++i) {
+    out << format("   ");
+    for (int j = 0; j < NUM_HANDS; j++) {
+      out << format("{:6.3f}, ", layout_stats.sfs_2u_finger[i][j] * 100);
     }
     out << format("\n");
   }

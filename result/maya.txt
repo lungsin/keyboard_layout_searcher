@@ -4,7 +4,7 @@ b l d g q  j f o u ,
 n r t s v  k h a e i 
 z x m c w  p y ' / . 
 
-Score: 0.0202179
+Score: 0.0202184
 ==== Stats static/stats/shai/shai.json
 SFB:  0.992 | SFS:  5.747
 SFB (2U):  0.061 | SFS (2U):  0.466
@@ -20,6 +20,16 @@ SFB per finger:
     0.093,  0.170, 
     0.056,  0.107, 
     0.335,  0.198, 
+SFB (2U) per finger:
+    0.000,  0.006, 
+    0.001,  0.002, 
+    0.016,  0.010, 
+    0.008,  0.018, 
+SFS (2U) per finger:
+    0.004,  0.001, 
+    0.045,  0.005, 
+    0.209,  0.126, 
+    0.039,  0.037, 
 Total alternates: 42.206
 Total rolls: 44.427
 Total redirect:  3.038
@@ -39,6 +49,16 @@ SFB per finger:
     0.090,  0.164, 
     0.053,  0.105, 
     0.322,  0.191, 
+SFB (2U) per finger:
+    0.000,  0.006, 
+    0.001,  0.002, 
+    0.015,  0.011, 
+    0.008,  0.017, 
+SFS (2U) per finger:
+    0.003,  0.002, 
+    0.032,  0.004, 
+    0.240,  0.102, 
+    0.109,  0.188, 
 Total alternates: 41.725
 Total rolls: 44.124
 Total redirect:  3.034
@@ -58,6 +78,16 @@ SFB per finger:
     0.095,  0.246, 
     0.064,  0.128, 
     0.605,  1.072, 
+SFB (2U) per finger:
+    0.001,  0.000, 
+    0.002,  0.000, 
+    0.022,  0.000, 
+    0.016,  0.043, 
+SFS (2U) per finger:
+    0.017,  0.000, 
+    0.057,  0.000, 
+    0.280,  0.000, 
+    0.177,  0.076, 
 Total alternates: 47.659
 Total rolls: 37.928
 Total redirect:  3.343
@@ -77,6 +107,16 @@ SFB per finger:
     0.100,  0.036, 
     0.018,  0.049, 
     0.102,  0.210, 
+SFB (2U) per finger:
+    0.000,  0.002, 
+    0.000,  0.001, 
+    0.007,  0.001, 
+    0.002,  0.001, 
+SFS (2U) per finger:
+    0.002,  0.001, 
+    0.004,  0.004, 
+    0.265,  0.005, 
+    0.046,  0.046, 
 Total alternates: 46.842
 Total rolls: 40.449
 Total redirect:  7.280
