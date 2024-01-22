@@ -1,0 +1,84 @@
+==========================
+Layout:
+b k n f w  . j u o y 
+s t r d c  l m e a i 
+v q x p g  h , z ' ; 
+
+Score: 0.00683302
+==== Stats static/stats/shai/shai.json
+SFB:  0.977 | SFS:  5.922
+SFB (2U):  0.074 | SFS (2U):  0.286
+HSB:  3.410 | HSS:  7.484
+FSB:  0.175 | FSS:  0.386
+Finger Usage:
+    8.978,  9.138, 
+    9.817, 16.018, 
+   13.042, 14.720, 
+   14.794, 13.410, 
+SFB per finger:
+    0.059,  0.047, 
+    0.005,  0.107, 
+    0.151,  0.216, 
+    0.106,  0.286, 
+Total alternates: 35.779
+Total rolls: 48.087
+Total redirect:  5.221
+
+==== Stats static/playground_stats/english.json
+SFB:  0.953 | SFS:  5.977
+SFB (2U):  0.073 | SFS (2U):  0.456
+HSB:  3.299 | HSS:  7.472
+FSB:  0.175 | FSS:  0.360
+Finger Usage:
+    8.927,  9.095, 
+    9.777, 15.985, 
+   12.987, 14.669, 
+   14.750, 13.456, 
+SFB per finger:
+    0.057,  0.047, 
+    0.004,  0.105, 
+    0.147,  0.208, 
+    0.102,  0.284, 
+Total alternates: 35.402
+Total rolls: 47.699
+Total redirect:  5.186
+
+==== Stats static/playground_stats/450k.json
+SFB:  1.250 | SFS:  6.825
+SFB (2U):  0.052 | SFS (2U):  0.210
+HSB:  3.182 | HSS:  5.561
+FSB:  0.179 | FSS:  0.261
+Finger Usage:
+   10.891, 10.887, 
+    7.533, 15.350, 
+   14.367, 14.960, 
+   14.852, 11.155, 
+SFB per finger:
+    0.076,  0.052, 
+    0.012,  0.128, 
+    0.199,  0.486, 
+    0.144,  0.153, 
+Total alternates: 39.007
+Total rolls: 43.922
+Total redirect:  7.125
+
+==== Stats static/oxeylyzer_stats/indonesian.json
+SFB:  0.846 | SFS:  7.812
+SFB (2U):  0.069 | SFS (2U):  0.142
+HSB:  5.457 | HSS:  7.480
+FSB:  0.035 | FSS:  0.128
+Finger Usage:
+    7.248,  9.427, 
+    9.845, 21.039, 
+   14.716, 12.622, 
+   11.928, 12.817, 
+SFB per finger:
+    0.013,  0.042, 
+    0.193,  0.049, 
+    0.144,  0.051, 
+    0.021,  0.333, 
+Total alternates: 46.285
+Total rolls: 37.791
+Total redirect:  9.968
+
+

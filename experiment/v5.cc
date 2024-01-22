@@ -67,24 +67,44 @@ struct CorpusConfig {
   double THRESHOLD_REDIRECTS;
 };
 
-constexpr CorpusConfig LANG_ENGLISH = {
-    .STATS_PATH = "static/playground_stats/english.json",
-    // .STATS_PATH = "static/oxeylyzer_stats/english.json",
-    .THRESHOLD_SFB = 0.9 * PERCENT,
+constexpr CorpusConfig LANG_SHAI = {
+    .STATS_PATH = "static/stats/shai/shai.json",
+    .THRESHOLD_SFB = 1 * PERCENT,
     .THRESHOLD_SFS = 6.5 * PERCENT,
-    .THRESHOLD_SFB_2U = 0.1 * PERCENT,
-    .THRESHOLD_SFS_2U = 0.5 * PERCENT,
+    .THRESHOLD_SFB_2U = 0.2 * PERCENT,
+    .THRESHOLD_SFS_2U = 0.6 * PERCENT,
     .ENABLE_SCISSORS_THRESHOLD = true,
     .THRESHOLD_HSB = 5 * PERCENT,
     .THRESHOLD_HSS = 8 * PERCENT,
-    .THRESHOLD_FSB = 0.3 * PERCENT,
-    .THRESHOLD_FSS = 0.3 * PERCENT,
+    .THRESHOLD_FSB = 1 * PERCENT,
+    .THRESHOLD_FSS = 1 * PERCENT,
+    .ENABLE_FINGER_THRESHOLD = true,
+    .THRESHOLD_FINGER_USAGE = {{0.12, 0.17, 0.25, 0.30}},
+    .ENABLE_SFB_PER_FINGER_THRESHOLD = true,
+    .THRESHOLD_SFB_PER_FINGER = {{0.16 * PERCENT, 0.2 * PERCENT, 0.1, 0.1}},
+    .THRESHOLD_ALTERNATES = 0.25,
+    .THRESHOLD_ROLLS = 0.25,
+    .THRESHOLD_REDIRECTS = 8 * PERCENT,
+};
+
+constexpr CorpusConfig LANG_ENGLISH = {
+    .STATS_PATH = "static/playground_stats/english.json",
+    // .STATS_PATH = "static/oxeylyzer_stats/english.json",
+    .THRESHOLD_SFB = 1 * PERCENT,
+    .THRESHOLD_SFS = 6.5 * PERCENT,
+    .THRESHOLD_SFB_2U = 0.2 * PERCENT,
+    .THRESHOLD_SFS_2U = 0.6 * PERCENT,
+    .ENABLE_SCISSORS_THRESHOLD = true,
+    .THRESHOLD_HSB = 5 * PERCENT,
+    .THRESHOLD_HSS = 8 * PERCENT,
+    .THRESHOLD_FSB = 1 * PERCENT,
+    .THRESHOLD_FSS = 1 * PERCENT,
     .ENABLE_FINGER_THRESHOLD = true,
     .THRESHOLD_FINGER_USAGE = {{0.12, 0.16, 0.25, 0.30}},
     .ENABLE_SFB_PER_FINGER_THRESHOLD = true,
     .THRESHOLD_SFB_PER_FINGER = {{0.15 * PERCENT, 0.2 * PERCENT, 0.1, 0.1}},
-    .THRESHOLD_ALTERNATES = 0.30,
-    .THRESHOLD_ROLLS = 0.30,
+    .THRESHOLD_ALTERNATES = 0.25,
+    .THRESHOLD_ROLLS = 0.25,
     .THRESHOLD_REDIRECTS = 8 * PERCENT,
 };
 
@@ -93,45 +113,42 @@ constexpr CorpusConfig LANG_450K = {
     // .STATS_PATH = "static/oxeylyzer_stats/450k.json",
     .THRESHOLD_SFB = 1 * PERCENT,
     .THRESHOLD_SFS = 7.5 * PERCENT,
-    .THRESHOLD_SFB_2U = 0.1 * PERCENT,
-    .THRESHOLD_SFS_2U = 0.5 * PERCENT,
+    .THRESHOLD_SFB_2U = 0.5 * PERCENT,
+    .THRESHOLD_SFS_2U = 1 * PERCENT,
     .ENABLE_SCISSORS_THRESHOLD = true,
     .THRESHOLD_HSB = 5 * PERCENT,
     .THRESHOLD_HSS = 8 * PERCENT,
-    .THRESHOLD_FSB = 0.3 * PERCENT,
-    .THRESHOLD_FSS = 0.3 * PERCENT,
+    .THRESHOLD_FSB = 1 * PERCENT,
+    .THRESHOLD_FSS = 1 * PERCENT,
     .ENABLE_FINGER_THRESHOLD = true,
     .THRESHOLD_FINGER_USAGE = {{0.14, 0.16, 0.25, 0.30}},
     .ENABLE_SFB_PER_FINGER_THRESHOLD = false,
     .THRESHOLD_SFB_PER_FINGER = {{0.1, 0.1, 0.1, 0.1}},
-    .THRESHOLD_ALTERNATES = 0.30,
-    .THRESHOLD_ROLLS = 0.30,
-    .THRESHOLD_REDIRECTS = 10 * PERCENT,
+    .THRESHOLD_ALTERNATES = 0.10,
+    .THRESHOLD_ROLLS = 0.10,
+    .THRESHOLD_REDIRECTS = 20 * PERCENT,
 };
 
 constexpr CorpusConfig LANG_INDONESIAN = {
-    .STATS_PATH = "static/playground_stats/indonesian.json",
-    // .STATS_PATH = "static/oxeylyzer_stats/indonesian.json",
+    // .STATS_PATH = "static/playground_stats/indonesian.json",
+    .STATS_PATH = "static/oxeylyzer_stats/indonesian.json",
     .THRESHOLD_SFB = 1 * PERCENT,
     .THRESHOLD_SFS = 8.5 * PERCENT,
-    .THRESHOLD_SFB_2U = 0.1 * PERCENT,
+    .THRESHOLD_SFB_2U = 0.2 * PERCENT,
     .THRESHOLD_SFS_2U = 0.5 * PERCENT,
     .ENABLE_SCISSORS_THRESHOLD = true,
     .THRESHOLD_HSB = 6 * PERCENT,
     .THRESHOLD_HSS = 12 * PERCENT,
-    .THRESHOLD_FSB = 0.6 * PERCENT,
+    .THRESHOLD_FSB = 1 * PERCENT,
     .THRESHOLD_FSS = 1.5 * PERCENT,
     .ENABLE_FINGER_THRESHOLD = true,
     .THRESHOLD_FINGER_USAGE = {{0.14, 0.22, 0.25, 0.30}},
     .ENABLE_SFB_PER_FINGER_THRESHOLD = true,
     .THRESHOLD_SFB_PER_FINGER = {{0.15 * PERCENT, 0.1, 0.1, 0.1}},
-    .THRESHOLD_ALTERNATES = 0.30,
-    .THRESHOLD_ROLLS = 0.30,
-    .THRESHOLD_REDIRECTS = 10 * PERCENT,
+    .THRESHOLD_ALTERNATES = 0.25,
+    .THRESHOLD_ROLLS = 0.25,
+    .THRESHOLD_REDIRECTS = 15 * PERCENT,
 };
-
-constexpr array ALL_CORPUS_CONFIG = {
-    array{LANG_ENGLISH, LANG_450K, LANG_INDONESIAN}};
 
 struct WeightedCorpusConfig {
   double weight;
@@ -139,9 +156,10 @@ struct WeightedCorpusConfig {
 };
 
 constexpr array WEIGHTED_CORPUS_CONFIG_LIST = array{
+    WeightedCorpusConfig{1, LANG_SHAI},
     WeightedCorpusConfig{1, LANG_ENGLISH},
-    WeightedCorpusConfig{1, LANG_450K},
-    WeightedCorpusConfig{1, LANG_INDONESIAN},
+    WeightedCorpusConfig{0, LANG_450K},
+    WeightedCorpusConfig{2, LANG_INDONESIAN},
 };
 constexpr int NUM_STATS = WEIGHTED_CORPUS_CONFIG_LIST.size();
 
@@ -157,14 +175,14 @@ constexpr auto CORPUS_CONFIG_LIST =
 
 // Weights config
 // SFB & SFS weight
-constexpr double WEIGHT_SFB = 1 * 0;
-constexpr double WEIGHT_SFS = 1 * 0;
+constexpr double WEIGHT_SFB = 0.1 * 0;
+constexpr double WEIGHT_SFS = 0.1 * 0;
 constexpr double WEIGHT_SFB_2U = 1;
 constexpr double WEIGHT_SFS_2U = 1;
 
 // Scissors weight
-constexpr double WEIGHT_HSB = 0.05;
-constexpr double WEIGHT_HSS = 0.05;
+constexpr double WEIGHT_HSB = 0.05 * 0;
+constexpr double WEIGHT_HSS = 0.05 * 0;
 constexpr double WEIGHT_FSB = 1;
 constexpr double WEIGHT_FSS = 1;
 
@@ -188,14 +206,24 @@ constexpr double WEIGHT_REDIRECT = 0;
 constexpr bool MUST_PUT_E_AT_RIGHT_HAND = true;
 
 constexpr bool MUST_PUT_SHORTCUT_KEYS_AT_LEFT_HAND = false;
-constexpr string SHORTCUT_KEYS = "zxcvws";
+constexpr string SHORTCUT_KEYS = "xcv";
 // ====
 
-const string RECURVA_PATH = "static/kb/recurva.kb";
-const string RECURVA_STATS_PATH = "result/recurva.txt";
+struct BaselinePath {
+  string KB_PATH;
+  string STATS_OUT_PATH;
+};
 
-const string MAYA_PATH = "static/kb/maya.kb";
-const string MAYA_STATS_PATH = "result/maya.txt";
+const array BASELINE_LIST = array{
+    BaselinePath{"static/kb/recurva.kb", "result/recurva.txt"},
+    BaselinePath{"static/kb/maya.kb", "result/maya.txt"},
+    BaselinePath{"static/kb/colemak_dh.kb", "result/colemak_dh.txt"},
+    BaselinePath{"static/kb/qwerty.kb", "result/qwerty.txt"},
+    BaselinePath{"static/kb/klungsmak.kb", "result/klungsmak.txt"},
+    BaselinePath{"static/kb/variant.kb", "result/variant.txt"},
+};
+
+const string RECURVA_PATH = "static/kb/recurva.kb";
 
 using Bucket = vector<char>;
 // [bucket_id][bucket_cnt_id] => string
@@ -499,8 +527,7 @@ struct LayoutStats {
 
     bool const is_current_finger_middle_or_ring =
         bucket_id == MIDDLE_FINGER || bucket_id == RING_FINGER;
-    bool const is_current_finger_middle_or_ring_or_pinky =
-        is_current_finger_middle_or_ring || bucket_id == PINKY_FINGER;
+    bool const is_current_finger_pinky = bucket_id == PINKY_FINGER;
     for (int other_bucket_id = 0; other_bucket_id < bucket_id;
          ++other_bucket_id) {
       bool const is_other_finger_middle_or_ring =
@@ -525,15 +552,22 @@ struct LayoutStats {
         updateHalfScissors(other_middle_row, top_row);
       }
 
-      bool const is_other_finger_middle_or_ring_or_pinky =
-          is_other_finger_middle_or_ring || other_bucket_id == PINKY_FINGER;
+      bool const is_other_finger_pinky = other_bucket_id == PINKY_FINGER;
       // [Full scissors] current finger hits the lower row
-      if (is_current_finger_middle_or_ring_or_pinky) {
+      if (is_current_finger_middle_or_ring) {
+        updateFullScissors(bottom_row, other_top_row);
+      }
+
+      if (is_current_finger_pinky && is_other_finger_middle_or_ring) {
         updateFullScissors(bottom_row, other_top_row);
       }
 
       // [Full scissors] Other finger hits the lower row
-      if (is_other_finger_middle_or_ring_or_pinky) {
+      if (is_other_finger_middle_or_ring) {
+        updateFullScissors(other_bottom_row, top_row);
+      }
+
+      if (is_other_finger_pinky && is_current_finger_middle_or_ring) {
         updateFullScissors(other_bottom_row, top_row);
       }
     }
@@ -742,6 +776,7 @@ inline bool isPruneableBruteScissors() {
 
   // Scissors
   for (int i = 0; i < NUM_STATS; ++i) {
+    if (WEIGHTED_CORPUS_CONFIG_LIST[i].weight == 0) continue;
     auto const& LANG_CONFIG = CORPUS_CONFIG_LIST[i];
     if (!LANG_CONFIG.ENABLE_SCISSORS_THRESHOLD) continue;
 
@@ -800,6 +835,7 @@ inline bool isPrunableBruteRowPermutFor2U() {
   // SFB & SFS 2U
 
   for (int i = 0; i < NUM_STATS; ++i) {
+    if (WEIGHTED_CORPUS_CONFIG_LIST[i].weight == 0) continue;
     auto const& LANG_CONFIG = CORPUS_CONFIG_LIST[i];
     auto const& stats = partial_layout.stats_per_language[i];
     if (stats.sfb_2u > LANG_CONFIG.THRESHOLD_SFB_2U ||
@@ -920,6 +956,7 @@ inline bool isPrunableShuffle() {
     return true;
 
   for (int i = 0; i < NUM_STATS; ++i) {
+    if (WEIGHTED_CORPUS_CONFIG_LIST[i].weight == 0) continue;
     auto const& LANG_CONFIG = CORPUS_CONFIG_LIST[i];
     auto const& stats = partial_layout.stats_per_language[i];
     if (stats.inverse_alternates > 1.0 - LANG_CONFIG.THRESHOLD_ALTERNATES ||
@@ -989,6 +1026,7 @@ inline bool isPrunable() {
     return true;
 
   for (int i = 0; i < NUM_STATS; ++i) {
+    if (WEIGHTED_CORPUS_CONFIG_LIST[i].weight == 0) continue;
     auto const& LANG_CONFIG = CORPUS_CONFIG_LIST[i];
     auto const& stats = partial_layout.stats_per_language[i];
     if (stats.sfb > LANG_CONFIG.THRESHOLD_SFB ||
@@ -996,25 +1034,27 @@ inline bool isPrunable() {
       return true;
   }
 
-  for (int stats_i = 0; stats_i < NUM_STATS; ++stats_i) {
-    auto const& LANG_CONFIG = CORPUS_CONFIG_LIST[stats_i];
+  for (int i = 0; i < NUM_STATS; ++i) {
+    if (WEIGHTED_CORPUS_CONFIG_LIST[i].weight == 0) continue;
+    auto const& LANG_CONFIG = CORPUS_CONFIG_LIST[i];
     if (!LANG_CONFIG.ENABLE_FINGER_THRESHOLD) continue;
 
-    auto const& stats = partial_layout.stats_per_language[stats_i];
-    for (int i = 0; i < NUM_BUCKET; ++i)
-      for (size_t j = 0; j < partial_layout.buckets[i].size(); ++j)
-        if (stats.finger_usage[i][j] > LANG_CONFIG.THRESHOLD_FINGER_USAGE[i])
+    auto const& stats = partial_layout.stats_per_language[i];
+    for (int j = 0; j < NUM_BUCKET; ++j)
+      for (size_t k = 0; k < partial_layout.buckets[j].size(); ++k)
+        if (stats.finger_usage[j][k] > LANG_CONFIG.THRESHOLD_FINGER_USAGE[j])
           return true;
   }
 
-  for (int stats_i = 0; stats_i < NUM_STATS; ++stats_i) {
-    auto const& LANG_CONFIG = CORPUS_CONFIG_LIST[stats_i];
+  for (int i = 0; i < NUM_STATS; ++i) {
+    if (WEIGHTED_CORPUS_CONFIG_LIST[i].weight == 0) continue;
+    auto const& LANG_CONFIG = CORPUS_CONFIG_LIST[i];
     if (!LANG_CONFIG.ENABLE_SFB_PER_FINGER_THRESHOLD) continue;
 
-    auto const& stats = partial_layout.stats_per_language[stats_i];
-    for (int i = 0; i < NUM_BUCKET; ++i)
-      for (size_t j = 0; j < partial_layout.buckets[i].size(); ++j)
-        if (stats.sfb_bucket[i][j] > LANG_CONFIG.THRESHOLD_SFB_PER_FINGER[i])
+    auto const& stats = partial_layout.stats_per_language[i];
+    for (int j = 0; j < NUM_BUCKET; ++j)
+      for (size_t k = 0; k < partial_layout.buckets[j].size(); ++k)
+        if (stats.sfb_bucket[j][k] > LANG_CONFIG.THRESHOLD_SFB_PER_FINGER[j])
           return true;
   }
 
@@ -1177,10 +1217,11 @@ int main() {
   best_partial_layout.setStats(aggregated_stats, stats_list);
 
   setBaseline(RECURVA_PATH);
-  dumpBaseline(toWorkingDirectory(RECURVA_STATS_PATH), RECURVA_PATH,
-               aggregated_stats, stats_list);
-  dumpBaseline(toWorkingDirectory(MAYA_STATS_PATH), MAYA_PATH, aggregated_stats,
-               stats_list);
+
+  for (auto const& BASELINE : BASELINE_LIST) {
+    dumpBaseline(toWorkingDirectory(BASELINE.STATS_OUT_PATH), BASELINE.KB_PATH,
+                 aggregated_stats, stats_list);
+  }
 
   brute(0);
 
