@@ -73,7 +73,7 @@ struct CorpusConfig {
 constexpr CorpusConfig LANG_SHAI = {
     .STATS_PATH = "static/stats/shai/shai.json",
     .THRESHOLD_SFB = 1 * PERCENT,
-    .THRESHOLD_SFS = 6.5 * PERCENT,
+    .THRESHOLD_SFS = 6 * PERCENT,
     .THRESHOLD_SFB_2U = 0.1 * PERCENT,
     .THRESHOLD_SFS_2U = 0.5 * PERCENT,
     .ENABLE_SCISSORS_THRESHOLD = true,
@@ -84,7 +84,7 @@ constexpr CorpusConfig LANG_SHAI = {
     .ENABLE_FINGER_THRESHOLD = true,
     .THRESHOLD_FINGER_USAGE = {{0.12, 0.161, 0.25, 0.30}},
     .ENABLE_SFB_PER_FINGER_THRESHOLD = true,
-    .THRESHOLD_SFB_PER_FINGER = {{0.16 * PERCENT, 0.25 * PERCENT, 0.3 * PERCENT,
+    .THRESHOLD_SFB_PER_FINGER = {{0.05 * PERCENT, 0.25 * PERCENT, 0.3 * PERCENT,
                                   0.1}},
     .ENABLE_SFS_2U_PER_FINGER_THRESHOLD = true,
     .THRESHOLD_SFS_2U_PER_FINGER = {{0.1 * PERCENT, 0.1 * PERCENT, 0.1, 0.1}},
@@ -108,7 +108,7 @@ constexpr CorpusConfig LANG_ENGLISH = {
     .ENABLE_FINGER_THRESHOLD = true,
     .THRESHOLD_FINGER_USAGE = {{0.12, 0.16, 0.25, 0.30}},
     .ENABLE_SFB_PER_FINGER_THRESHOLD = true,
-    .THRESHOLD_SFB_PER_FINGER = {{0.15 * PERCENT, 0.25 * PERCENT, 0.3 * PERCENT,
+    .THRESHOLD_SFB_PER_FINGER = {{0.05 * PERCENT, 0.25 * PERCENT, 0.3 * PERCENT,
                                   0.1}},
     .ENABLE_SFS_2U_PER_FINGER_THRESHOLD = true,
     .THRESHOLD_SFS_2U_PER_FINGER = {{0.1 * PERCENT, 0.1 * PERCENT, 0.1, 0.1}},
@@ -140,6 +140,28 @@ constexpr CorpusConfig LANG_450K = {
     .THRESHOLD_REDIRECTS = 10 * PERCENT,
 };
 
+constexpr CorpusConfig LANG_OSCAR_ID = {
+    .STATS_PATH = "static/stats/oscar/id.json",
+    .THRESHOLD_SFB = 1 * PERCENT,
+    .THRESHOLD_SFS = 8.5 * PERCENT,
+    .THRESHOLD_SFB_2U = 0.1 * PERCENT,
+    .THRESHOLD_SFS_2U = 0.5 * PERCENT,
+    .ENABLE_SCISSORS_THRESHOLD = true,
+    .THRESHOLD_HSB = 6 * PERCENT,
+    .THRESHOLD_HSS = 12 * PERCENT,
+    .THRESHOLD_FSB = 1 * PERCENT,
+    .THRESHOLD_FSS = 1.5 * PERCENT,
+    .ENABLE_FINGER_THRESHOLD = true,
+    .THRESHOLD_FINGER_USAGE = {{0.14, 0.22, 0.25, 0.30}},
+    .ENABLE_SFB_PER_FINGER_THRESHOLD = true,
+    .THRESHOLD_SFB_PER_FINGER = {{0.1 * PERCENT, 0.1, 0.1, 0.1}},
+    .ENABLE_SFS_2U_PER_FINGER_THRESHOLD = true,
+    .THRESHOLD_SFS_2U_PER_FINGER = {{0.1 * PERCENT, 0.1 * PERCENT, 0.1, 0.1}},
+    .THRESHOLD_ALTERNATES = 0.30,
+    .THRESHOLD_ROLLS = 0.30,
+    .THRESHOLD_REDIRECTS = 11 * PERCENT,
+};
+
 constexpr CorpusConfig LANG_INDONESIAN = {
     // .STATS_PATH = "static/playground_stats/indonesian.json",
     .STATS_PATH = "static/oxeylyzer_stats/indonesian.json",
@@ -155,7 +177,7 @@ constexpr CorpusConfig LANG_INDONESIAN = {
     .ENABLE_FINGER_THRESHOLD = true,
     .THRESHOLD_FINGER_USAGE = {{0.14, 0.22, 0.25, 0.30}},
     .ENABLE_SFB_PER_FINGER_THRESHOLD = true,
-    .THRESHOLD_SFB_PER_FINGER = {{0.15 * PERCENT, 0.1, 0.1, 0.1}},
+    .THRESHOLD_SFB_PER_FINGER = {{0.1 * PERCENT, 0.1, 0.1, 0.1}},
     .ENABLE_SFS_2U_PER_FINGER_THRESHOLD = true,
     .THRESHOLD_SFS_2U_PER_FINGER = {{0.1 * PERCENT, 0.1 * PERCENT, 0.1, 0.1}},
     .THRESHOLD_ALTERNATES = 0.30,
@@ -172,7 +194,8 @@ constexpr array WEIGHTED_CORPUS_CONFIG_LIST = array{
     WeightedCorpusConfig{1, LANG_SHAI},
     WeightedCorpusConfig{1, LANG_ENGLISH},
     WeightedCorpusConfig{0, LANG_450K},
-    WeightedCorpusConfig{2, LANG_INDONESIAN},
+    WeightedCorpusConfig{1, LANG_OSCAR_ID},
+    WeightedCorpusConfig{1, LANG_INDONESIAN},
 };
 constexpr int NUM_STATS = WEIGHTED_CORPUS_CONFIG_LIST.size();
 
@@ -218,8 +241,8 @@ constexpr double WEIGHT_REDIRECT = 1e-5;
 // here so that the letter E is at right hand.
 constexpr bool MUST_PUT_E_AT_RIGHT_HAND = true;
 
-constexpr bool MUST_PUT_SHORTCUT_KEYS_AT_LEFT_HAND = true;
-constexpr string SHORTCUT_KEYS = "xcv";
+constexpr bool MUST_PUT_SHORTCUT_KEYS_AT_LEFT_HAND = false;
+constexpr string SHORTCUT_KEYS = "xcvz";
 // ====
 
 struct BaselinePath {
@@ -230,15 +253,18 @@ struct BaselinePath {
 const array BASELINE_LIST = array{
     BaselinePath{"static/kb/recurva.kb", "result/recurva.txt"},
     BaselinePath{"static/kb/maya.kb", "result/maya.txt"},
+    BaselinePath{"static/kb/sturdy.kb", "result/sturdy.txt"},
     BaselinePath{"static/kb/colemak_dh.kb", "result/colemak_dh.txt"},
     BaselinePath{"static/kb/qwerty.kb", "result/qwerty.txt"},
     BaselinePath{"static/kb/klungsmak.kb", "result/klungsmak.txt"},
-    BaselinePath{"static/kb/klungsmak.xcv.kb", "result/klungsmak.xcv.txt"},
+    BaselinePath{"static/kb/klungsmak.english.kb",
+                 "result/klungsmak.english.txt"},
     BaselinePath{"static/kb/klungsmak.xcvz.kb", "result/klungsmak.xcvz.txt"},
     BaselinePath{"static/kb/variant.kb", "result/variant.txt"},
 };
 
 const string RECURVA_PATH = "static/kb/recurva.kb";
+const string KLUNGSMAK_PATH = "static/kb/klungsmak.xcvz.kb";
 
 using Bucket = vector<char>;
 // [bucket_id][bucket_cnt_id] => string
@@ -773,6 +799,8 @@ long long num_shuffle_done = 0;
 long long num_row_permut_2u_done = 0;
 long long num_brute_scissors_done = 0;
 
+void printLayoutWithStats(ostream& out, PartialLayout const& layout);
+
 inline void doneBruteScissors() {
   assert(best_partial_layout.aggregated_stats.score >=
          partial_layout.aggregated_stats.score);
@@ -784,6 +812,7 @@ inline void doneBruteScissors() {
                    best_partial_layout.aggregated_stats.score)
          << endl;
   }
+  printLayoutWithStats(cout, best_partial_layout);
   ++num_brute_scissors_done;
 }
 
@@ -892,8 +921,8 @@ constexpr array<array<int, num_keys>, num_results> getRowPermutFor2U() {
   auto isPermut = [](array<int, num_keys> const& arr) {
     array<int, num_keys> arr2 = arr;
     sort(arr2.begin(), arr2.end());
-    for (size_t i = 0; i < arr2.size(); ++i)
-      if (arr2[i] != (size_t)i) return false;
+    for (int i = 0; i < (int)arr2.size(); ++i)
+      if (arr2[i] != i) return false;
     return true;
   };
 
@@ -1270,7 +1299,8 @@ int main() {
   partial_layout.setStats(aggregated_stats, stats_list);
   best_partial_layout.setStats(aggregated_stats, stats_list);
 
-  setBaseline(RECURVA_PATH);
+  // setBaseline(RECURVA_PATH);
+  setBaseline(KLUNGSMAK_PATH);
 
   for (auto const& BASELINE : BASELINE_LIST) {
     dumpBaseline(toWorkingDirectory(BASELINE.STATS_OUT_PATH), BASELINE.KB_PATH,
