@@ -1,43 +1,9 @@
-cc_binary(
-    name = "v2",
-    srcs = [
-        "v2.cc",
-    ],
-    data = ["//static:corpus_data"],
-    deps = [
-        "@nlohmann_json//:json",
-    ],
-)
-
-cc_binary(
-    name = "v3",
-    srcs = [
-        "v3.cc",
-    ],
-    data = ["//static:corpus_data"],
-    deps = [
-        "@nlohmann_json//:json",
-    ],
-)
-
 cc_library(
     name = "utils",
     srcs = [
         "utils.hpp",
     ],
     deps = [
-        "@nlohmann_json//:json",
-    ],
-)
-
-cc_binary(
-    name = "v4",
-    srcs = [
-        "v4.cc",
-    ],
-    data = ["//static:corpus_data"],
-    deps = [
-        "utils",
         "@nlohmann_json//:json",
     ],
 )

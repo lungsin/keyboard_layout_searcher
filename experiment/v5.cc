@@ -260,7 +260,7 @@ const array BASELINE_LIST = array{
     BaselinePath{"static/kb/klungsmak.english.kb",
                  "result/klungsmak.english.txt"},
     BaselinePath{"static/kb/klungsmak.xcvz.kb", "result/klungsmak.xcvz.txt"},
-    BaselinePath{"static/kb/variant.kb", "result/variant.txt"},
+    BaselinePath{"static/kb/experiment.kb", "result/experiment.txt"},
 };
 
 const string RECURVA_PATH = "static/kb/recurva.kb";
