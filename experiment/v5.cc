@@ -239,9 +239,9 @@ constexpr double WEIGHT_REDIRECT = 1e-5;
 // Sometimes the result of this searcher puts the vowels at right hand.
 // Since a lot of layouts prefer to put vowels at right hand, this config is
 // here so that the letter E is at right hand.
-constexpr bool MUST_PUT_E_AT_RIGHT_HAND = true;
+constexpr bool MUST_PUT_E_AT_RIGHT_HAND = false;
 
-constexpr bool MUST_PUT_SHORTCUT_KEYS_AT_LEFT_HAND = false;
+constexpr bool MUST_PUT_SHORTCUT_KEYS_AT_LEFT_HAND = true;
 constexpr string SHORTCUT_KEYS = "xcvz";
 // ====
 

@@ -4,7 +4,7 @@ v m l c p  x f o u j
 s t r d y  . n a e i 
 z k q g w  b h ' ; , 
 
-Score: 0.016554
+Score: 0.0187081
 ==== Stats static/stats/shai/shai.json
 SFB:  0.969 | SFS:  5.902
 SFB (2U):  0.037 | SFS (2U):  0.413
@@ -120,5 +120,34 @@ SFS (2U) per finger:
 Total alternates: 46.790
 Total rolls: 39.466
 Total redirect:  8.480
+
+==== Stats static/oxeylyzer_stats/indonesian.json
+SFB:  1.085 | SFS:  7.354
+SFB (2U):  0.032 | SFS (2U):  0.908
+HSB:  2.907 | HSS:  7.909
+FSB:  0.227 | FSS:  1.350
+Finger Usage:
+    4.721,  9.635, 
+   14.097, 12.615, 
+    8.160, 21.039, 
+   13.310, 16.066, 
+SFB per finger:
+    0.001,  0.277, 
+    0.226,  0.035, 
+    0.101,  0.049, 
+    0.048,  0.347, 
+SFB (2U) per finger:
+    0.000,  0.001, 
+    0.025,  0.000, 
+    0.001,  0.001, 
+    0.002,  0.002, 
+SFS (2U) per finger:
+    0.000,  0.035, 
+    0.682,  0.002, 
+    0.002,  0.005, 
+    0.161,  0.022, 
+Total alternates: 47.324
+Total rolls: 38.613
+Total redirect:  7.823
 
 
