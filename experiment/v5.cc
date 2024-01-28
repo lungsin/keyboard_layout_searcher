@@ -259,6 +259,8 @@ const array BASELINE_LIST = array{
     BaselinePath{"static/kb/klungsmak.kb", "result/klungsmak.txt"},
     BaselinePath{"static/kb/klungsmak.english.kb",
                  "result/klungsmak.english.txt"},
+    BaselinePath{"static/kb/klungsmak.english.xcvz.kb",
+                 "result/klungsmak.english.xcvz.txt"},
     BaselinePath{"static/kb/klungsmak.xcvz.kb", "result/klungsmak.xcvz.txt"},
     BaselinePath{"static/kb/experiment.kb", "result/experiment.txt"},
 };
