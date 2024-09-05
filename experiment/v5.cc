@@ -243,6 +243,21 @@ constexpr bool MUST_PUT_E_AT_RIGHT_HAND = false;
 
 constexpr bool MUST_PUT_SHORTCUT_KEYS_AT_LEFT_HAND = true;
 constexpr string SHORTCUT_KEYS = "xcvz";
+
+constexpr bool MUST_PUT_VIM_COMBINATION_AT_DIFFERENT_BUCKET = false;
+constexpr int VIM_BIGRAMS_SIZE = 1 + 4 * 0 + 1 * 0;
+constexpr array<array<char, 2>, VIM_BIGRAMS_SIZE> VIM_BIGRAMS = {{
+  {'j', 'k'}, // vim vertical motion
+  // {'h', 'l'}, // vim horizontal motion
+
+  // vim motion cross
+  // {'j', 'h'},
+  // {'j', 'l'},
+  // {'k', 'h'},
+  // {'k', 'l'},
+
+  // {'g', 'd'}, // lsp go to definition
+}};
 // ====
 
 struct BaselinePath {
@@ -267,6 +282,9 @@ const array BASELINE_LIST = array{
 
 const string RECURVA_PATH = "static/kb/recurva.kb";
 const string KLUNGSMAK_PATH = "static/kb/klungsmak.xcvz.kb";
+const string BASELINE_PATH = RECURVA_PATH;
+
+const string BEST_RESULT_OUT_PATH = "result/result.v6.txt";
 
 using Bucket = vector<char>;
 // [bucket_id][bucket_cnt_id] => string
@@ -636,6 +654,9 @@ struct PartialLayout {
 
   Layout final_layout;
 
+  // Utility stats for pruning purpose
+  array<array<int, MAX_ASCII>, MAX_ASCII> is_bigram_in_same_bucket;
+
   PartialLayout() = default;
 
   inline void setStats(FastStats const& aggregated_stats,
@@ -682,6 +703,11 @@ struct PartialLayout {
                                  modifier);
     for (auto& stats : stats_per_language)
       stats.updateStats(buckets, bucket_id, bucket_cnt_id, key, modifier);
+
+    // Update utility stats
+    for (char const key_2 : buckets[bucket_id][bucket_cnt_id]) {
+      is_bigram_in_same_bucket[key][key_2] += modifier;
+    }
   }
 
   inline void pushKey(int bucket_id, int const bucket_cnt_id, char key) {
@@ -1124,6 +1150,17 @@ inline bool isPrunable() {
           return true;
   }
 
+  if (MUST_PUT_VIM_COMBINATION_AT_DIFFERENT_BUCKET) {
+    for (const auto& vim_bigram: VIM_BIGRAMS) {
+      char key_1 = vim_bigram[0];
+      char key_2 = vim_bigram[1];
+      if (partial_layout.is_bigram_in_same_bucket[key_1][key_2] 
+            || partial_layout.is_bigram_in_same_bucket[key_2][key_1]) {
+        return true;
+      }
+    }
+  }
+
   return false;
 }
 
@@ -1302,7 +1339,8 @@ int main() {
   best_partial_layout.setStats(aggregated_stats, stats_list);
 
   // setBaseline(RECURVA_PATH);
-  setBaseline(KLUNGSMAK_PATH);
+  // setBaseline(KLUNGSMAK_PATH);
+  setBaseline(BASELINE_PATH);
 
   for (auto const& BASELINE : BASELINE_LIST) {
     dumpBaseline(toWorkingDirectory(BASELINE.STATS_OUT_PATH), BASELINE.KB_PATH,
@@ -1320,5 +1358,6 @@ int main() {
 
   if (num_shuffle_done == 0) return 0;
 
+  // ofstream best_result_out(BEST_RESULT_OUT_PATH);
   printLayoutWithStats(cout, best_partial_layout);
 }
