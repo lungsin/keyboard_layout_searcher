@@ -1,3 +1,3 @@
 # keyboard_layout_searcher
 
-WIP! Currently, I'm still heavily experimentating with different algo.
+Read ALGORITHM.md for the algorithm writeup.

@@ -4,7 +4,7 @@ b l d g q  j f o u ,
 n r t s v  k h a e i 
 z x m c w  p y ' / . 
 
-Score: 0.0196856
+Score: 0.00573426
 ==== Stats static/stats/shai/shai.json
 SFB:  0.992 | SFS:  5.747
 SFB (2U):  0.061 | SFS (2U):  0.466

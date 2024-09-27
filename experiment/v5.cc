@@ -85,7 +85,7 @@ constexpr CorpusConfig LANG_SHAI = {
     .THRESHOLD_FINGER_USAGE = {{0.12, 0.161, 0.25, 0.30}},
     .ENABLE_SFB_PER_FINGER_THRESHOLD = true,
     .THRESHOLD_SFB_PER_FINGER = {{0.05 * PERCENT, 0.25 * PERCENT, 0.3 * PERCENT,
-                                  0.1}},
+                                  0.45 * PERCENT}},
     .ENABLE_SFS_2U_PER_FINGER_THRESHOLD = true,
     .THRESHOLD_SFS_2U_PER_FINGER = {{0.1 * PERCENT, 0.1 * PERCENT, 0.1, 0.1}},
     .THRESHOLD_ALTERNATES = 0.30,
@@ -154,12 +154,12 @@ constexpr CorpusConfig LANG_OSCAR_ID = {
     .ENABLE_FINGER_THRESHOLD = true,
     .THRESHOLD_FINGER_USAGE = {{0.14, 0.22, 0.25, 0.30}},
     .ENABLE_SFB_PER_FINGER_THRESHOLD = true,
-    .THRESHOLD_SFB_PER_FINGER = {{0.1 * PERCENT, 0.1, 0.1, 0.1}},
+    .THRESHOLD_SFB_PER_FINGER = {{0.3 * PERCENT, 0.1, 0.1, 0.1}},
     .ENABLE_SFS_2U_PER_FINGER_THRESHOLD = true,
     .THRESHOLD_SFS_2U_PER_FINGER = {{0.1 * PERCENT, 0.1 * PERCENT, 0.1, 0.1}},
     .THRESHOLD_ALTERNATES = 0.30,
     .THRESHOLD_ROLLS = 0.30,
-    .THRESHOLD_REDIRECTS = 11 * PERCENT,
+    .THRESHOLD_REDIRECTS = 15 * PERCENT,
 };
 
 constexpr CorpusConfig LANG_INDONESIAN = {
@@ -177,12 +177,12 @@ constexpr CorpusConfig LANG_INDONESIAN = {
     .ENABLE_FINGER_THRESHOLD = true,
     .THRESHOLD_FINGER_USAGE = {{0.14, 0.22, 0.25, 0.30}},
     .ENABLE_SFB_PER_FINGER_THRESHOLD = true,
-    .THRESHOLD_SFB_PER_FINGER = {{0.1 * PERCENT, 0.1, 0.1, 0.1}},
+    .THRESHOLD_SFB_PER_FINGER = {{0.3 * PERCENT, 0.1, 0.1, 0.1}},
     .ENABLE_SFS_2U_PER_FINGER_THRESHOLD = true,
     .THRESHOLD_SFS_2U_PER_FINGER = {{0.1 * PERCENT, 0.1 * PERCENT, 0.1, 0.1}},
     .THRESHOLD_ALTERNATES = 0.30,
     .THRESHOLD_ROLLS = 0.30,
-    .THRESHOLD_REDIRECTS = 11 * PERCENT,
+    .THRESHOLD_REDIRECTS = 15 * PERCENT,
 };
 
 struct WeightedCorpusConfig {
@@ -217,17 +217,17 @@ constexpr double WEIGHT_SFB_2U = 1;
 constexpr double WEIGHT_SFS_2U = 1;
 
 // Scissors weight
-constexpr double WEIGHT_HSB = 0.05 * 0;
-constexpr double WEIGHT_HSS = 0.05 * 0;
-constexpr double WEIGHT_FSB = 1;
-constexpr double WEIGHT_FSS = 1;
+constexpr double WEIGHT_HSB = 0.5 * 0.01;
+constexpr double WEIGHT_HSS = 0.5 * 0.01;
+constexpr double WEIGHT_FSB = 1 * 0.01;
+constexpr double WEIGHT_FSS = 1 * 0.01;
 
 // Finger-wise weight
 constexpr double WEIGHT_FINGER_USAGE_OVERALL = 0.01 * 0;
 constexpr array<double, NUM_BUCKET> WEIGHT_FINGER_USAGE = {4, 3, 2, 1};
 
 constexpr double WEIGHT_SFB_PER_FINGER_OVERALL = 1 * 0;
-constexpr array<double, NUM_BUCKET> WEIGHT_SFB_PER_FINGER = {4, 3, 2, 1};
+constexpr array<double, NUM_BUCKET> WEIGHT_SFB_PER_FINGER = {0, 0, 0, 1};
 
 // Trigram weight
 constexpr double WEIGHT_ALTERNATES = 0;
@@ -239,25 +239,22 @@ constexpr double WEIGHT_REDIRECT = 1e-5;
 // Sometimes the result of this searcher puts the vowels at right hand.
 // Since a lot of layouts prefer to put vowels at right hand, this config is
 // here so that the letter E is at right hand.
-constexpr bool MUST_PUT_E_AT_RIGHT_HAND = false;
+constexpr bool MUST_PUT_E_AT_RIGHT_HAND = true;
 
-constexpr bool MUST_PUT_SHORTCUT_KEYS_AT_LEFT_HAND = true;
+constexpr bool MUST_PUT_SHORTCUT_KEYS_AT_LEFT_HAND = false;
 constexpr string SHORTCUT_KEYS = "xcvz";
 
-constexpr bool MUST_PUT_VIM_COMBINATION_AT_DIFFERENT_BUCKET = false;
-constexpr int VIM_BIGRAMS_SIZE = 1 + 4 * 0 + 1 * 0;
-constexpr array<array<char, 2>, VIM_BIGRAMS_SIZE> VIM_BIGRAMS = {{
-  {'j', 'k'}, // vim vertical motion
-  // {'h', 'l'}, // vim horizontal motion
+constexpr bool MUST_PUT_IMPORTANT_BIGRAM_AT_DIFFERENT_BUCKET = true;
+constexpr array IMPORTANT_BIGRAMS = {
+  // array{'g', 'g'}, // dummy
+  array{'j', 'k'}, // vim vertical motion
+  // array{'h', 'l'}, // vim horizontal motion
 
-  // vim motion cross
-  // {'j', 'h'},
-  // {'j', 'l'},
-  // {'k', 'h'},
-  // {'k', 'l'},
-
-  // {'g', 'd'}, // lsp go to definition
-}};
+  array{'g', 'd'}, // lsp go to definition
+  array{'c', 'd'}, // cd command
+  array{'c', 'p'}, // cp command
+  array{'g', 'c'}, // gcc command
+};
 // ====
 
 struct BaselinePath {
@@ -280,6 +277,7 @@ const array BASELINE_LIST = array{
     BaselinePath{"static/kb/experiment.kb", "result/experiment.txt"},
 };
 
+const string MAYA_PATH = "static/kb/maya.kb";
 const string RECURVA_PATH = "static/kb/recurva.kb";
 const string KLUNGSMAK_PATH = "static/kb/klungsmak.xcvz.kb";
 const string BASELINE_PATH = RECURVA_PATH;
@@ -1150,10 +1148,10 @@ inline bool isPrunable() {
           return true;
   }
 
-  if (MUST_PUT_VIM_COMBINATION_AT_DIFFERENT_BUCKET) {
-    for (const auto& vim_bigram: VIM_BIGRAMS) {
-      char key_1 = vim_bigram[0];
-      char key_2 = vim_bigram[1];
+  if (MUST_PUT_IMPORTANT_BIGRAM_AT_DIFFERENT_BUCKET) {
+    for (const array<char, 2>& important_bigram: IMPORTANT_BIGRAMS) {
+      const char& key_1 = important_bigram[0];
+      const char& key_2 = important_bigram[1];
       if (partial_layout.is_bigram_in_same_bucket[key_1][key_2] 
             || partial_layout.is_bigram_in_same_bucket[key_2][key_1]) {
         return true;
