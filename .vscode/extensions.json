@@ -1,0 +1,9 @@
+{
+  "recommendations": [
+    "llvm-vs-code-extensions.vscode-clangd",
+    "bazelbuild.vscode-bazel",
+    "ms-python.python",
+    "ms-python.vscode-pylance",
+    "ms-python.black-formatter"
+  ]
+}

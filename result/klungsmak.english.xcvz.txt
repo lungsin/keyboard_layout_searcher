@@ -1,0 +1,153 @@
+==========================
+Layout:
+m y l g v  k j u a , 
+t s r d c  n b e o i 
+q x z p w  h f ; ' . 
+
+Score: 0.0050924
+==== Stats static/stats/shai/shai.json
+SFB:  1.000 | SFS:  5.716
+SFB (2U):  0.047 | SFS (2U):  0.192
+HSB:  4.305 | HSS:  7.289
+FSB:  0.116 | FSS:  0.316
+Finger Usage:
+   11.442,  9.222, 
+    8.553, 16.018, 
+   10.273, 14.721, 
+   13.732, 15.957, 
+SFB per finger:
+    0.032,  0.022, 
+    0.164,  0.107, 
+    0.095,  0.174, 
+    0.117,  0.290, 
+SFB (2U) per finger:
+    0.000,  0.006, 
+    0.003,  0.016, 
+    0.002,  0.000, 
+    0.010,  0.008, 
+SFS (2U) per finger:
+    0.000,  0.001, 
+    0.001,  0.065, 
+    0.029,  0.004, 
+    0.066,  0.027, 
+Total alternates: 35.820
+Total rolls: 47.581
+Total redirect:  5.973
+
+==== Stats static/playground_stats/english.json
+SFB:  0.965 | SFS:  5.874
+SFB (2U):  0.047 | SFS (2U):  0.280
+HSB:  4.196 | HSS:  6.486
+FSB:  0.118 | FSS:  0.395
+Finger Usage:
+   11.389,  9.211, 
+    8.513, 15.985, 
+   10.229, 14.673, 
+   13.686, 15.959, 
+SFB per finger:
+    0.031,  0.021, 
+    0.157,  0.105, 
+    0.092,  0.167, 
+    0.112,  0.281, 
+SFB (2U) per finger:
+    0.000,  0.006, 
+    0.003,  0.017, 
+    0.002,  0.001, 
+    0.010,  0.008, 
+SFS (2U) per finger:
+    0.001,  0.002, 
+    0.002,  0.065, 
+    0.021,  0.004, 
+    0.130,  0.056, 
+Total alternates: 35.427
+Total rolls: 47.217
+Total redirect:  5.947
+
+==== Stats static/playground_stats/450k.json
+SFB:  1.305 | SFS:  6.517
+SFB (2U):  0.079 | SFS (2U):  0.337
+HSB:  3.413 | HSS:  6.448
+FSB:  0.028 | FSS:  0.188
+Finger Usage:
+    9.717,  9.037, 
+   10.305, 15.350, 
+   12.791, 14.514, 
+   14.669, 13.611, 
+SFB per finger:
+    0.032,  0.000, 
+    0.245,  0.128, 
+    0.107,  0.246, 
+    0.127,  0.420, 
+SFB (2U) per finger:
+    0.000,  0.000, 
+    0.029,  0.000, 
+    0.011,  0.000, 
+    0.013,  0.026, 
+SFS (2U) per finger:
+    0.004,  0.000, 
+    0.004,  0.000, 
+    0.110,  0.000, 
+    0.172,  0.047, 
+Total alternates: 40.420
+Total rolls: 41.760
+Total redirect:  7.300
+
+==== Stats static/stats/oscar/id.json
+SFB:  1.078 | SFS:  8.429
+SFB (2U):  0.142 | SFS (2U):  0.428
+HSB:  2.620 | HSS:  5.647
+FSB:  0.308 | FSS:  0.526
+Finger Usage:
+    9.569,  9.461, 
+    5.925, 20.740, 
+    8.094, 12.881, 
+   11.854, 21.391, 
+SFB per finger:
+    0.008,  0.235, 
+    0.032,  0.029, 
+    0.108,  0.053, 
+    0.036,  0.576, 
+SFB (2U) per finger:
+    0.000,  0.002, 
+    0.001,  0.002, 
+    0.000,  0.001, 
+    0.007,  0.129, 
+SFS (2U) per finger:
+    0.001,  0.001, 
+    0.001,  0.006, 
+    0.004,  0.006, 
+    0.147,  0.261, 
+Total alternates: 40.254
+Total rolls: 40.528
+Total redirect: 13.741
+
+==== Stats static/oxeylyzer_stats/indonesian.json
+SFB:  1.185 | SFS:  8.570
+SFB (2U):  0.161 | SFS (2U):  0.517
+HSB:  2.520 | HSS:  6.010
+FSB:  0.361 | FSS:  0.598
+Finger Usage:
+    9.291,  9.749, 
+    6.219, 21.039, 
+    8.195, 12.615, 
+   11.777, 20.758, 
+SFB per finger:
+    0.009,  0.286, 
+    0.077,  0.049, 
+    0.102,  0.035, 
+    0.021,  0.606, 
+SFB (2U) per finger:
+    0.000,  0.002, 
+    0.001,  0.017, 
+    0.001,  0.000, 
+    0.004,  0.136, 
+SFS (2U) per finger:
+    0.001,  0.001, 
+    0.000,  0.033, 
+    0.007,  0.002, 
+    0.144,  0.329, 
+Total alternates: 40.621
+Total rolls: 39.749
+Total redirect: 13.073
+
+
